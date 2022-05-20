@@ -1,0 +1,105 @@
+.header {
+  display: flex;
+  border-bottom: 1px solid var(--gray-1);
+  background-color: #ffffff;
+}
+
+.header__title svg {
+  height: 2.5rem;
+}
+
+.header__title h1 {
+  font-size: 2rem;
+  margin-left: 0.5rem;
+  line-height: 1em;
+  font-weight: 300;
+}
+
+.header__title {
+  display: none;
+  padding: 1rem 1.5rem;
+  min-width: 16rem;
+}
+
+.header__navigation {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+}
+
+.header__navigation__search {
+  flex: 1 1 100%;
+}
+
+.header__navigation nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media screen and (min-width: 992px) {
+  .header__title {
+    display: flex;
+    align-items: center;
+  }
+
+  .header__navigation {
+    padding: 1rem 1.5rem;
+  }
+
+  .header__navigation__menu {
+    display: none;
+  }
+
+  .header__navigation__search {
+    flex-basis: 50%;
+    max-width: 60ch;
+    min-width: 40ch;
+  }
+
+  .header__navigation nav {
+    flex: 1 1 50%;
+  }
+}
+
+.header__navigation__links {
+  display: none;
+}
+
+.header__navigation__links h3 {
+  margin-right: 2rem;
+  font-size: 1rem;
+  line-height: 1em;
+  font-weight: 400;
+}
+
+@media screen and (min-width: 1200px) {
+  .header__navigation__links {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.header__navigation__user {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: var(--bg-color);
+}
+
+@media screen and (min-width: 576px) {
+  .header__navigation {
+    gap: 1rem;
+  }
+
+  .header__navigation__user {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .header__navigation__menu {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
