@@ -2,6 +2,7 @@
 
 :root {
   --font: "Inter", sans-serif;
+
   --fg-color: #000000;
   --bg-color: #f1ecff;
   --gray-1: #888888;
@@ -34,4 +35,9 @@ h6 {
 
 body {
   background-color: var(--bg-color);
+}
+
+p {
+  margin-left: 17.5rem;
+  width: calc(100% - 19rem);
 }

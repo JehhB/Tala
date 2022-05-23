@@ -41,7 +41,7 @@
   justify-content: flex-end;
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 905px) {
   .header__title {
     display: flex;
     align-items: center;
@@ -75,7 +75,7 @@
   color: #000000;
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: 1240px) {
   .header__navigation__links {
     display: flex;
     align-items: center;
@@ -89,7 +89,7 @@
   background-color: var(--bg-color);
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 600px) {
   .header__navigation {
     gap: 1rem;
   }

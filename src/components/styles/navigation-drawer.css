@@ -9,7 +9,7 @@
   border-right: 1px solid var(--gray-1);
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width: 600px) {
   .navigation-drawer {
     --header-height: 4.5rem;
   }
