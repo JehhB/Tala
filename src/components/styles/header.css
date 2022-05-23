@@ -10,6 +10,7 @@
 
 .header__title h1 {
   font-size: 2rem;
+  letter-spacing: -2px;
   margin-left: 0.5rem;
   line-height: 1em;
   font-weight: 300;
@@ -18,7 +19,9 @@
 .header__title {
   display: none;
   padding: 1rem 1.5rem;
-  min-width: 16rem;
+  width: 16rem;
+  flex-shrink: 0;
+  border-right: 1px solid transparent;
 }
 
 .header__navigation {
@@ -48,10 +51,6 @@
     padding: 1rem 1.5rem;
   }
 
-  .header__navigation__menu {
-    display: none;
-  }
-
   .header__navigation__search {
     flex-basis: 50%;
     max-width: 60ch;
@@ -67,11 +66,13 @@
   display: none;
 }
 
-.header__navigation__links h3 {
+.header__navigation__links a {
   margin-right: 2rem;
   font-size: 1rem;
   line-height: 1em;
   font-weight: 400;
+  text-decoration: none;
+  color: #000000;
 }
 
 @media screen and (min-width: 1200px) {
@@ -96,10 +97,5 @@
   .header__navigation__user {
     width: 2.5rem;
     height: 2.5rem;
-  }
-
-  .header__navigation__menu {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 }

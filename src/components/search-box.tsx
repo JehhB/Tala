@@ -1,10 +1,10 @@
-import { useRef } from "react";
+import { FunctionComponent, useRef } from "react";
 
 import { ReactComponent as SearchIcon } from "../assets/images/search-icon.svg";
 
 import "./styles/search-box.css";
 
-const SearchBox = function () {
+const SearchBox: FunctionComponent<{}> = function () {
   const input = useRef<HTMLInputElement>(null);
 
   return (

@@ -47,6 +47,7 @@
 }
 
 .search__box__icon {
+  color: var(--gray-1);
   display: none;
 }
 
