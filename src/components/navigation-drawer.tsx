@@ -43,14 +43,11 @@ const NavigationDrawer: FunctionComponent<{}> = function () {
       </div>
       <nav
         className="category__nav"
-        style={
-          {
-            "--category-color": cssColor(
-              colorPalletGradient((index + 1) / mockData.length) ??
-                rgb(255, 0, 0)
-            ),
-          } as CSSProperties
-        }
+        style={{
+          borderLeftColor: cssColor(
+            colorPalletGradient((index + 1) / mockData.length) ?? rgb(255, 0, 0)
+          ),
+        }}
       >
         {category.notes.map((note, index) => (
           <a href="#" key={index} className="category__nav__link">
@@ -62,7 +59,7 @@ const NavigationDrawer: FunctionComponent<{}> = function () {
   ));
 
   return (
-    <div className="navigation-drawer">
+    <aside className="navigation-drawer">
       <div className="navigation-drawer__categories">{categories}</div>
       <div className="navigation-drawer__options">
         <a href="#" className="option">
@@ -74,7 +71,7 @@ const NavigationDrawer: FunctionComponent<{}> = function () {
           <h3 className="option__title">Create new category</h3>
         </a>
       </div>
-    </div>
+    </aside>
   );
 };
 

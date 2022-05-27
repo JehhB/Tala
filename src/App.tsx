@@ -1,13 +1,7 @@
-import HeaderBar from "./components/header";
-import NavigationDrawer from "./components/navigation-drawer";
+import ConstellationPage from "./pages/constellation-page";
 
 const App = function () {
-  return (
-    <>
-      <HeaderBar />
-      <NavigationDrawer />
-    </>
-  );
+  return <ConstellationPage />;
 };
 
 export default App;
