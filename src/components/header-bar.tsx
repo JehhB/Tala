@@ -3,14 +3,14 @@ import { FunctionComponent } from "react";
 import { ReactComponent as TalaLogo } from "../assets/images/tala.svg";
 import SearchBox from "./search-box";
 
-import "./styles/header.css";
+import "./styles/header-bar.css";
 
 type HeaderBarProps = {
   user?: any;
   children?: JSX.Element | JSX.Element[];
 };
 
-const HeaderBar: FunctionComponent<HeaderBarProps> = function ({ children }) {
+const HeaderBar: FunctionComponent<HeaderBarProps> = function (props) {
   return (
     <header className="header">
       <div className="header__title">
@@ -18,7 +18,7 @@ const HeaderBar: FunctionComponent<HeaderBarProps> = function ({ children }) {
         <h1>Tala</h1>
       </div>
       <div className="header__navigation">
-        {children}
+        {props.children}
         <div className="header__navigation__search">
           <SearchBox />
         </div>

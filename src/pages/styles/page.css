@@ -7,3 +7,30 @@
 .page__main {
   flex: 1 1 auto;
 }
+
+.page__main__sidebar {
+  height: 100%;
+  width: min-content;
+  position: fixed;
+  inset: 0 0 auto -16rem;
+  z-index: 20;
+  transition: left var(--lg-enter-dur) ease-in-out;
+}
+
+.page__main__sidebar--active {
+  left: 0;
+  transition-duration: var(--lg-exit-dur);
+}
+
+@media screen and (min-width: 600px) {
+  .page__main__sidebar {
+    position: relative;
+  }
+}
+
+@media screen and (min-width: 905px) {
+  .page__main__sidebar {
+    left: 0px !important;
+    transition-duration: var(--lg-exit-dur) !important;
+  }
+}

@@ -8,6 +8,13 @@
   --gray-1: #888888;
   --gray-2: #555555;
   --gray-3: #333333;
+
+  --sm-enter-dur: 100ms;
+  --sm-exit-dur: 100ms;
+  --md-enter-dur: 250ms;
+  --md-exit-dur: 200ms;
+  --lg-enter-dur: 300ms;
+  --lg-exit-dur: 250ms;
 }
 
 *,
