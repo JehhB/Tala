@@ -7,6 +7,38 @@
   border-right: 1px solid var(--gray-1);
 }
 
+.navigation-drawer__title {
+  overflow: hidden;
+  height: 6rem;
+  transition: height 0 ease;
+  transition-delay: var(--lg-exit-dur);
+}
+
+@media screen and (min-width: 905px) {
+  .navigation-drawer__title {
+    height: 0;
+    transition: height var(--lg-enter-dur) ease;
+  }
+}
+
+.navigation-drawer__title__container {
+  padding: 2.5rem 0 1rem 0;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.navigation-drawer__title__container svg {
+  height: 2.5rem;
+}
+
+.navigation-drawer__title__container h1 {
+  font-size: 2rem;
+  line-height: 1em;
+  font-weight: 300;
+}
+
 .navigation-drawer__categories {
   flex: 1 1 0;
   overflow-y: scroll;

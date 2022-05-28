@@ -14,7 +14,7 @@
   position: fixed;
   inset: 0 0 auto -16rem;
   z-index: 20;
-  transition: left var(--lg-enter-dur) ease-in-out;
+  transition: left var(--lg-enter-dur) ease;
 }
 
 .page__main__sidebar--active {

@@ -4,6 +4,7 @@ import { faGear } from "@fortawesome/free-solid-svg-icons";
 
 import { colorPalletGradient, cssColor, rgb } from "../utils";
 import { ReactComponent as PlusIcon } from "../assets/images/plus-icon.svg";
+import { ReactComponent as TalaLogo } from "../assets/images/tala.svg";
 
 import "./styles/navigation-drawer.css";
 
@@ -60,6 +61,12 @@ const NavigationDrawer: FunctionComponent<{}> = function () {
 
   return (
     <aside className="navigation-drawer">
+      <div className="navigation-drawer__title">
+        <div className="navigation-drawer__title__container">
+          <TalaLogo />
+          <h1>Tala</h1>
+        </div>
+      </div>
       <div className="navigation-drawer__categories">{categories}</div>
       <div className="navigation-drawer__options">
         <a href="#" className="option">
