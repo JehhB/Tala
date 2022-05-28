@@ -10,14 +10,17 @@
 .navigation-drawer__title {
   overflow: hidden;
   height: 6rem;
-  transition: height 0 ease;
+  transition-property: height;
   transition-delay: var(--lg-exit-dur);
+  transition-duration: 0s;
+  transition-timing-function: ease;
 }
 
 @media screen and (min-width: 905px) {
   .navigation-drawer__title {
     height: 0;
-    transition: height var(--lg-enter-dur) ease;
+    transition-duration: 0s;
+    transition-delay: 0s;
   }
 }
 

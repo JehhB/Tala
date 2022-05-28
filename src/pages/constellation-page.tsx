@@ -1,6 +1,8 @@
 import { FunctionComponent, useState, useEffect } from "react";
 
 import { useMediaQuery } from "../hooks";
+import { ReactComponent as MenuIcon } from "../assets/images/menu-icon.svg";
+import { ReactComponent as XMarkIcon } from "../assets/images/xmark-icon.svg";
 import HeaderBar from "../components/header-bar";
 import NavigationDrawer from "../components/navigation-drawer";
 
@@ -19,12 +21,20 @@ const ConstellationPage: FunctionComponent<{}> = function () {
 
   return (
     <div className="page">
-      <HeaderBar />
+      <HeaderBar>
+        <div
+          className={"page__header__menu" + (isSidebarActive ? "--active" : "")}
+          onClick={function () {
+            setSidebarActive((active) => !active);
+          }}
+        >
+          {isSidebarActive ? <XMarkIcon /> : <MenuIcon />}
+        </div>
+      </HeaderBar>
       <div className="page__main">
         <div
           className={
-            "page__main__sidebar" +
-            (isSidebarActive ? " page__main__sidebar--active" : "")
+            "page__main__sidebar" + (isSidebarActive ? "--active" : "")
           }
         >
           <NavigationDrawer />

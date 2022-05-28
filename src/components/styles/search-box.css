@@ -1,6 +1,7 @@
 .search {
   border-radius: 4px;
   position: relative;
+  cursor: text;
 }
 
 .search:focus-within {
