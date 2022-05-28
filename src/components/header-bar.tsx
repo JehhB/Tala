@@ -14,8 +14,10 @@ const HeaderBar: FunctionComponent<HeaderBarProps> = function (props) {
   return (
     <header className="header">
       <div className="header__title">
-        <TalaLogo />
-        <h1>Tala</h1>
+        <div className="header__title__container">
+          <TalaLogo />
+          <h1>Tala</h1>
+        </div>
       </div>
       <div className="header__navigation">
         {props.children}
