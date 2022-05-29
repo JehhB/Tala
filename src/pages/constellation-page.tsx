@@ -5,8 +5,9 @@ import { ReactComponent as MenuIcon } from "../assets/images/menu-icon.svg";
 import { ReactComponent as XMarkIcon } from "../assets/images/xmark-icon.svg";
 import HeaderBar from "../components/header-bar";
 import NavigationDrawer from "../components/navigation-drawer";
+import NoteContainer from "../components/note-container";
 
-import "./styles/page.css";
+import "./styles/constellation-page.css";
 
 const ConstellationPage: FunctionComponent<{}> = function () {
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -36,10 +37,13 @@ const ConstellationPage: FunctionComponent<{}> = function () {
   );
 
   return (
-    <div className="page">
+    <div className="constellation-page">
       <HeaderBar>
         <div
-          className={"page__header__menu" + (isSidebarActive ? "--active" : "")}
+          className={
+            "constellation-page__header__menu" +
+            (isSidebarActive ? "--active" : "")
+          }
           onClick={function (event) {
             event.stopPropagation();
             setSidebarActive((active) => !active);
@@ -48,14 +52,22 @@ const ConstellationPage: FunctionComponent<{}> = function () {
           {isSidebarActive ? <XMarkIcon /> : <MenuIcon />}
         </div>
       </HeaderBar>
-      <div className="page__main">
+      <div className="constellation-page__main">
         <div
           ref={sidebarRef}
           className={
-            "page__main__sidebar" + (isSidebarActive ? "--active" : "")
+            "constellation-page__main__sidebar" +
+            (isSidebarActive ? "--active" : "")
           }
         >
           <NavigationDrawer />
+        </div>
+        <div className="content">
+          <div className="content__note">
+            <NoteContainer title="test">
+              <h1>Hello world</h1>
+            </NoteContainer>
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,129 @@
+.constellation-page {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.constellation-page__header__menu,
+.constellation-page__header__menu--active {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+@media screen and (min-width: 600px) {
+  .constellation-page__header__menu,
+  .constellation-page__header__menu--active {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media screen and (min-width: 905px) {
+  .constellation-page__header__menu,
+  .constellation-page__header__menu--active {
+    display: none;
+  }
+}
+
+.constellation-page__header__menu--active::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  width: 125%;
+  height: 125%;
+  border-radius: 50%;
+  background-color: var(--bg-color);
+}
+
+.constellation-page__header__menu svg,
+.constellation-page__header__menu--active svg {
+  position: relative;
+  height: 100%;
+  z-index: 2;
+}
+
+.constellation-page__main {
+  flex: 1 1 auto;
+  position: relative;
+  display: flex;
+  overflow: scroll;
+}
+
+.constellation-page__main__sidebar,
+.constellation-page__main__sidebar--active {
+  height: 100%;
+  width: min-content;
+  position: fixed;
+  inset: 0 0 auto -16rem;
+  z-index: 20;
+  transition: left var(--lg-enter-dur) ease;
+}
+
+.constellation-page__main__sidebar--active {
+  left: 0;
+  transition-duration: var(--lg-exit-dur);
+}
+
+@media screen and (min-width: 600px) {
+  .constellation-page__main__sidebar,
+  .constellation-page__main__sidebar--active {
+    position: absolute;
+  }
+}
+
+@media screen and (min-width: 905px) {
+  .constellation-page__main__sidebar,
+  .constellation-page__main__sidebar--active {
+    position: relative;
+    left: 0px !important;
+    transition-duration: var(--lg-exit-dur) !important;
+  }
+}
+
+@media screen and (min-width: 905px) {
+  .constellation-page__main__sidebar--active .navigation-drawer__title {
+    transition-duration: var(--lg-enter-dur) !important;
+  }
+}
+
+.content {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  overflow: scroll;
+}
+
+@media screen and (min-width: 600px) {
+  .content {
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-width: 905px) {
+  .content {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.content__note {
+  flex: 1 1 100%;
+}
+
+@media screen and (min-width: 905px) {
+  .content::after {
+    content: "";
+    flex: 1 1 50%;
+  }
+
+  .content__note {
+    flex-basis: 50%;
+    min-width: 40ch;
+    max-width: 60ch;
+  }
+}

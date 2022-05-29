@@ -1,5 +1,6 @@
 .header {
   display: flex;
+  align-items: center;
   border-bottom: 1px solid var(--gray-1);
   background-color: #ffffff;
 }
@@ -14,7 +15,7 @@
 .header__title__container {
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 0 1.5rem;
   width: 16rem;
   border-right: 1px solid transparent;
 }
