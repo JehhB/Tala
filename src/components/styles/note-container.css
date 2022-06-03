@@ -2,4 +2,35 @@
   background-color: #ffffff;
   min-height: 100%;
   height: auto;
+  border-radius: 4px;
+  border: 1px solid var(--gray-1);
+}
+
+.note__header {
+  background-color: #ffffff;
+  position: sticky;
+  top: -1rem;
+  display: flex;
+  align-items: center;
+  height: 2.5rem;
+  padding: 0 1rem;
+  border-top: 4px solid;
+  border-bottom: 1px solid var(--gray-1);
+}
+
+.note__header__title {
+  margin-left: 1rem;
+  font-size: 1rem;
+  line-height: 1em;
+  font-weight: 400;
+}
+
+.note__header__toc,
+.note__header__edit {
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.note__header__edit {
+  margin-left: auto;
 }

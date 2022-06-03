@@ -64,9 +64,7 @@ const ConstellationPage: FunctionComponent<{}> = function () {
         </div>
         <div className="content">
           <div className="content__note">
-            <NoteContainer title="test">
-              <h1>Hello world</h1>
-            </NoteContainer>
+            <NoteContainer title="test"></NoteContainer>
           </div>
         </div>
       </div>
