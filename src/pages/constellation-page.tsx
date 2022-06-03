@@ -1,6 +1,6 @@
-import { FunctionComponent, useState, useEffect, useRef } from "react";
+import { FunctionComponent } from "react";
 
-import { useMediaQuery } from "../hooks";
+import { useResponsiveSidebar } from "../hooks";
 import { ReactComponent as MenuIcon } from "../assets/images/menu-icon.svg";
 import { ReactComponent as XMarkIcon } from "../assets/images/xmark-icon.svg";
 import HeaderBar from "../components/header-bar";
@@ -9,31 +9,7 @@ import NavigationDrawer from "../components/navigation-drawer";
 import "./styles/page.css";
 
 const ConstellationPage: FunctionComponent<{}> = function () {
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const [isSidebarActive, setSidebarActive] = useState<boolean>(false);
-  const isLaptop = useMediaQuery("screen and (min-width: 905px)");
-
-  useEffect(
-    function () {
-      if (isLaptop) setSidebarActive(false);
-
-      const documentListener = () => {
-        setSidebarActive(false);
-      };
-      const sidebarListener = (event: Event) => {
-        event.stopPropagation();
-      };
-
-      document.addEventListener("click", documentListener);
-      sidebarRef.current?.addEventListener("click", sidebarListener);
-
-      return () => {
-        document.removeEventListener("click", documentListener);
-        sidebarRef.current?.removeEventListener("click", sidebarListener);
-      };
-    },
-    [isLaptop]
-  );
+  const [sidebarRef, isSidebarActive, toggleSidebar] = useResponsiveSidebar();
 
   return (
     <div className="page">
@@ -42,7 +18,7 @@ const ConstellationPage: FunctionComponent<{}> = function () {
           className={"page__header__menu" + (isSidebarActive ? "--active" : "")}
           onClick={function (event) {
             event.stopPropagation();
-            setSidebarActive((active) => !active);
+            toggleSidebar();
           }}
         >
           {isSidebarActive ? <XMarkIcon /> : <MenuIcon />}
