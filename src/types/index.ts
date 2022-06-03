@@ -16,7 +16,12 @@ export type Category = { id: string; name: string; index: number };
 export type Constellation = {
   id: string;
   categories: Category[];
-  notes: { id: string; title: string; description?: string }[];
+  notes: {
+    id: string;
+    category_id: string;
+    title: string;
+    description?: string;
+  }[];
   links: Link[];
 };
 
