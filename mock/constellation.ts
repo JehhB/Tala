@@ -1,6 +1,6 @@
 import { MockMethod } from "vite-plugin-mock";
 import { random, lorem } from "faker";
-import { Constellation, Category, Link } from "../src/types";
+import { Constellation, Category, Link } from "../src/utils";
 
 const generate_response = function (): Constellation {
   const MOCK_CATEGORIES_COUNT = 3;
