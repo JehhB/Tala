@@ -19,7 +19,7 @@
 @media screen and (min-width: 905px) {
   .navigation-drawer__title {
     height: 0;
-    transition-duration: 0s;
+    transition-duration: var(--md-exit-dur);
     transition-delay: 0s;
   }
 }

@@ -1,43 +1,36 @@
-import { CSSProperties, FunctionComponent } from "react";
+import { FunctionComponent, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 
-import { colorPalletGradient, cssColor, rgb } from "../utils";
+import { ConstellationContext } from "../contexts";
 import { ReactComponent as PlusIcon } from "../assets/images/plus-icon.svg";
 import { ReactComponent as TalaLogo } from "../assets/images/tala.svg";
+
+import {
+  colorPalletGradient,
+  cssColor,
+  rgb,
+  groupBy,
+  Constellation,
+} from "../utils";
 
 import "./styles/navigation-drawer.css";
 
 type Category = { name: string; notes: { name: string }[] };
-const mockData: Category[] = [
-  {
-    name: "Fleeting notes",
-    notes: [
-      { name: "Fleeting note 1" },
-      { name: "Fleeting note 2" },
-      { name: "Fleeting note with long title" },
-    ],
-  },
-  {
-    name: "Literature notes",
-    notes: [
-      { name: "Literature note 1" },
-      { name: "Literature note 2" },
-      { name: "Literature note with long title" },
-    ],
-  },
-  {
-    name: "Permanent notes",
-    notes: [
-      { name: "Permanent note 1" },
-      { name: "Permanent note 2" },
-      { name: "Permanent note with long title" },
-    ],
-  },
-];
 
 const NavigationDrawer: FunctionComponent<{}> = function () {
-  const categories = mockData.map((category, index) => (
+  const constellationData = useContext<Constellation>(ConstellationContext);
+
+  const notesData = groupBy(
+    constellationData.notes,
+    (element) => element.category_id
+  );
+
+  const categoriesData = [...constellationData.categories].sort(
+    (a, b) => a.index - b.index
+  );
+
+  const categories = categoriesData.map((category, index) => (
     <div key={index} className="category">
       <div className="category__header">
         <h2>{category.name}</h2>
@@ -46,13 +39,14 @@ const NavigationDrawer: FunctionComponent<{}> = function () {
         className="category__nav"
         style={{
           borderLeftColor: cssColor(
-            colorPalletGradient((index + 1) / mockData.length) ?? rgb(255, 0, 0)
+            colorPalletGradient((index + 1) / categoriesData.length) ??
+              rgb(255, 0, 0)
           ),
         }}
       >
-        {category.notes.map((note, index) => (
+        {notesData[category.id].map((note, index) => (
           <a href="#" key={index} className="category__nav__link">
-            {note.name}
+            {note.title}
           </a>
         ))}
       </nav>
