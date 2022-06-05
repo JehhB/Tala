@@ -78,17 +78,10 @@
 }
 
 @media screen and (min-width: 905px) {
-  .constellation-page__main__sidebar,
-  .constellation-page__main__sidebar--active {
+  .constellation-page__main__sidebar {
     position: relative;
     left: 0px !important;
     transition-duration: var(--lg-exit-dur) !important;
-  }
-}
-
-@media screen and (min-width: 905px) {
-  .constellation-page__main__sidebar--active .navigation-drawer__title {
-    transition-duration: var(--lg-enter-dur) !important;
   }
 }
 

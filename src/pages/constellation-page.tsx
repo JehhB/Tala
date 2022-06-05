@@ -30,11 +30,12 @@ const ConstellationPage: FunctionComponent<{}> = function () {
         constellationData ?? { id: "", categories: [], notes: [], links: [] }
       }
     >
-      <div className="page">
+      <div className="constellation-page">
         <HeaderBar>
           <div
             className={
-              "page__header__menu" + (isSidebarActive ? "--active" : "")
+              "constellation-page__header__menu" +
+              (isSidebarActive ? "--active" : "")
             }
             onClick={function (event) {
               event.stopPropagation();
@@ -44,19 +45,20 @@ const ConstellationPage: FunctionComponent<{}> = function () {
             {isSidebarActive ? <XMarkIcon /> : <MenuIcon />}
           </div>
         </HeaderBar>
-        <div className="page__main">
+        <div className="constellation-page__main">
           <div
             ref={sidebarRef}
             className={
-              "page__main__sidebar" + (isSidebarActive ? "--active" : "")
+              "constellation-page__main__sidebar" +
+              (isSidebarActive ? "--active" : "")
             }
           >
             <NavigationDrawer />
           </div>
-        </div>
-        <div className="content">
-          <div className="content__note">
-            <NoteContainer title="test"></NoteContainer>
+          <div className="content">
+            <div className="content__note">
+              <NoteContainer title="test"></NoteContainer>
+            </div>
           </div>
         </div>
       </div>
