@@ -1,21 +1,30 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
 import { ConstellationPage } from "./pages";
 import { NoteContainer } from "./components";
 
 const App = function () {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="JohnDoe/Constellation" />} />
+        <Route index element={<Navigate to="JohnDoe/Constellation" />} />
         <Route path=":user">
-          <Route path="/:user/" element={<Navigate to="./Constellation" />} />
+          <Route index element={<Navigate to="./Constellation" />} />
           <Route path=":constellation" element={<ConstellationPage />}>
-            <Route path=":notes" element={<NoteContainer title="test" />} />
+            <Route
+              caseSensitive
+              path=":notes"
+              element={<NoteContainer title="test" />}
+            />
           </Route>
         </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 };
 

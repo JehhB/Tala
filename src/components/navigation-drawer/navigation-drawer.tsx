@@ -1,4 +1,5 @@
 import { FunctionComponent, useContext } from "react";
+import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,8 +10,9 @@ import { ReactComponent as TalaLogo } from "../../assets/images/tala.svg";
 import {
   colorPalletGradient,
   cssColor,
-  rgb,
   groupBy,
+  rgb,
+  toValidTitle,
   Constellation,
 } from "../../utils";
 
@@ -43,9 +45,15 @@ export const NavigationDrawer: FunctionComponent<{}> = function () {
         }}
       >
         {notesData[category.id].map((note, index) => (
-          <a href="#" key={index} className="category__nav__link">
+          <NavLink
+            key={index}
+            to={toValidTitle(note.title)}
+            className={({ isActive }) =>
+              "category__nav__link" + (isActive ? "--active" : "")
+            }
+          >
             {note.title}
-          </a>
+          </NavLink>
         ))}
       </nav>
     </div>
