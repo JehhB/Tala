@@ -105,6 +105,11 @@
   }
 }
 
+.content__graph {
+  position: absolute;
+  inset: 0;
+}
+
 .content__note {
   flex: 1 1 100%;
 }

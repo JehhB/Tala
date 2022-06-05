@@ -2,7 +2,12 @@ import { FunctionComponent, useEffect, useState } from "react";
 
 import { useResponsiveSidebar } from "../../hooks";
 import { ConstellationContext } from "../../contexts";
-import { HeaderBar, NavigationDrawer, NoteContainer } from "../../components";
+import {
+  ConstellationGraph,
+  HeaderBar,
+  NavigationDrawer,
+  NoteContainer,
+} from "../../components";
 import { Constellation } from "../../utils";
 
 import { ReactComponent as MenuIcon } from "../../assets/images/menu-icon.svg";
@@ -54,6 +59,9 @@ export const ConstellationPage: FunctionComponent<{}> = function () {
             <NavigationDrawer />
           </div>
           <div className="content">
+            <div className="content__graph">
+              <ConstellationGraph />
+            </div>
             <div className="content__note">
               <NoteContainer title="test"></NoteContainer>
             </div>
