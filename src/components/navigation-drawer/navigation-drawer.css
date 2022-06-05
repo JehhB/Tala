@@ -44,7 +44,7 @@
 
 .navigation-drawer__categories {
   flex: 1 0 3rem;
-  overflow-y: scroll;
+  overflow-y: auto;
   scrollbar-gutter: stable;
   padding: 0 1.5rem;
 }

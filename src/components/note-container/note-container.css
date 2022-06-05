@@ -9,13 +9,19 @@
 .note__header {
   background-color: #ffffff;
   position: sticky;
-  top: -1rem;
+  top: 0;
   display: flex;
   align-items: center;
   height: 2.5rem;
   padding: 0 1rem;
   border-top: 4px solid;
   border-bottom: 1px solid var(--gray-1);
+}
+
+@media screen and (min-width: 600px) {
+  .note__header {
+    top: -1rem;
+  }
 }
 
 .note__header__title {
