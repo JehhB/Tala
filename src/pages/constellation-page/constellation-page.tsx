@@ -1,4 +1,5 @@
 import { FunctionComponent, useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 
 import { useResponsiveSidebar } from "../../hooks";
 import { ConstellationContext } from "../../contexts";
@@ -6,7 +7,6 @@ import {
   ConstellationGraph,
   HeaderBar,
   NavigationDrawer,
-  NoteContainer,
 } from "../../components";
 import { Constellation } from "../../utils";
 
@@ -63,7 +63,7 @@ export const ConstellationPage: FunctionComponent<{}> = function () {
               <ConstellationGraph />
             </div>
             <div className="content__note">
-              <NoteContainer title="test"></NoteContainer>
+              <Outlet />
             </div>
           </div>
         </div>
