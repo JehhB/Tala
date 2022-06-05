@@ -1,18 +1,16 @@
 import { FunctionComponent, useEffect, useState } from "react";
 
-import { useResponsiveSidebar } from "../hooks";
-import { ConstellationContext } from "../contexts";
-import { ReactComponent as MenuIcon } from "../assets/images/menu-icon.svg";
-import { ReactComponent as XMarkIcon } from "../assets/images/xmark-icon.svg";
+import { useResponsiveSidebar } from "../../hooks";
+import { ConstellationContext } from "../../contexts";
+import { HeaderBar, NavigationDrawer, NoteContainer } from "../../components";
+import { Constellation } from "../../utils";
 
-import HeaderBar from "../components/header-bar";
-import NavigationDrawer from "../components/navigation-drawer";
-import NoteContainer from "../components/note-container";
+import { ReactComponent as MenuIcon } from "../../assets/images/menu-icon.svg";
+import { ReactComponent as XMarkIcon } from "../../assets/images/xmark-icon.svg";
 
-import "./styles/constellation-page.css";
-import { Constellation } from "../utils";
+import "./constellation-page.css";
 
-const ConstellationPage: FunctionComponent<{}> = function () {
+export const ConstellationPage: FunctionComponent<{}> = function () {
   const [sidebarRef, isSidebarActive, toggleSidebar] = useResponsiveSidebar();
 
   const [constellationData, setConstellationData] =
@@ -65,5 +63,3 @@ const ConstellationPage: FunctionComponent<{}> = function () {
     </ConstellationContext.Provider>
   );
 };
-
-export default ConstellationPage;

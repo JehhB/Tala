@@ -2,9 +2,9 @@ import { FunctionComponent, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 
-import { ConstellationContext } from "../contexts";
-import { ReactComponent as PlusIcon } from "../assets/images/plus-icon.svg";
-import { ReactComponent as TalaLogo } from "../assets/images/tala.svg";
+import { ConstellationContext } from "../../contexts";
+import { ReactComponent as PlusIcon } from "../../assets/images/plus-icon.svg";
+import { ReactComponent as TalaLogo } from "../../assets/images/tala.svg";
 
 import {
   colorPalletGradient,
@@ -12,13 +12,11 @@ import {
   rgb,
   groupBy,
   Constellation,
-} from "../utils";
+} from "../../utils";
 
-import "./styles/navigation-drawer.css";
+import "./navigation-drawer.css";
 
-type Category = { name: string; notes: { name: string }[] };
-
-const NavigationDrawer: FunctionComponent<{}> = function () {
+export const NavigationDrawer: FunctionComponent<{}> = function () {
   const constellationData = useContext<Constellation>(ConstellationContext);
 
   const notesData = groupBy(
@@ -75,5 +73,3 @@ const NavigationDrawer: FunctionComponent<{}> = function () {
     </aside>
   );
 };
-
-export default NavigationDrawer;

@@ -1,10 +1,10 @@
 import { FunctionComponent, useRef } from "react";
 
-import { ReactComponent as SearchIcon } from "../assets/images/search-icon.svg";
+import { ReactComponent as SearchIcon } from "../../assets/images/search-icon.svg";
 
-import "./styles/search-box.css";
+import "./search-box.css";
 
-const SearchBox: FunctionComponent<{}> = function () {
+export const SearchBox: FunctionComponent<{}> = function () {
   const input = useRef<HTMLInputElement>(null);
 
   return (
@@ -26,5 +26,3 @@ const SearchBox: FunctionComponent<{}> = function () {
     </div>
   );
 };
-
-export default SearchBox;

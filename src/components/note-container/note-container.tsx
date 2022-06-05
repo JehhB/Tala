@@ -2,9 +2,9 @@ import { FunctionComponent, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListUl, faPen } from "@fortawesome/free-solid-svg-icons";
 
-import { colorPalletGradient, cssColor, colorPallet } from "../utils";
+import { colorPalletGradient, cssColor, colorPallet } from "../../utils";
 
-import "./styles/note-container.css";
+import "./note-container.css";
 
 type NoteContainerProps = {
   title: string;
@@ -12,7 +12,9 @@ type NoteContainerProps = {
   children?: ReactNode;
 };
 
-const NoteContainer: FunctionComponent<NoteContainerProps> = function (props) {
+export const NoteContainer: FunctionComponent<NoteContainerProps> = function (
+  props
+) {
   return (
     <main className="note">
       <div
@@ -31,5 +33,3 @@ const NoteContainer: FunctionComponent<NoteContainerProps> = function (props) {
     </main>
   );
 };
-
-export default NoteContainer;

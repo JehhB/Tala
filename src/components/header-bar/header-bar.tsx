@@ -1,16 +1,16 @@
 import { FunctionComponent } from "react";
 
-import { ReactComponent as TalaLogo } from "../assets/images/tala.svg";
-import SearchBox from "./search-box";
+import { ReactComponent as TalaLogo } from "../../assets/images/tala.svg";
+import { SearchBox } from "../search-box";
 
-import "./styles/header-bar.css";
+import "./header-bar.css";
 
 type HeaderBarProps = {
   user?: any;
   children?: JSX.Element | JSX.Element[];
 };
 
-const HeaderBar: FunctionComponent<HeaderBarProps> = function (props) {
+export const HeaderBar: FunctionComponent<HeaderBarProps> = function (props) {
   return (
     <header className="header">
       <div className="header__title">
@@ -36,5 +36,3 @@ const HeaderBar: FunctionComponent<HeaderBarProps> = function (props) {
     </header>
   );
 };
-
-export default HeaderBar;

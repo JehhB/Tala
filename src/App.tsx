@@ -1,4 +1,4 @@
-import ConstellationPage from "./pages/constellation-page";
+import { ConstellationPage } from "./pages";
 
 const App = function () {
   return <ConstellationPage />;
