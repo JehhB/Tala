@@ -1,5 +1,6 @@
 import { FunctionComponent } from "react";
 import { Outlet, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import useFetch from "react-fetch-hook";
 
 import { useResponsiveSidebar } from "../../hooks";
@@ -24,42 +25,47 @@ export const ConstellationPage: FunctionComponent<{}> = function () {
   );
 
   return (
-    <ConstellationContext.Provider value={constellation}>
-      <div className="constellation-page">
-        <HeaderBar>
-          <div
-            className={
-              "constellation-page__header__menu" +
-              (isSidebarActive ? "--active" : "")
-            }
-            onClick={function (event) {
-              event.stopPropagation();
-              toggleSidebar();
-            }}
-          >
-            {isSidebarActive ? <XMarkIcon /> : <MenuIcon />}
-          </div>
-        </HeaderBar>
-        <div className="constellation-page__main">
-          <div
-            ref={sidebarRef}
-            className={
-              "constellation-page__main__sidebar" +
-              (isSidebarActive ? "--active" : "")
-            }
-          >
-            <NavigationDrawer />
-          </div>
-          <div className="content">
-            <div className="content__graph">
-              <ConstellationGraph />
+    <>
+      <Helmet>
+        <title>{constellationName}</title>
+      </Helmet>
+      <ConstellationContext.Provider value={constellation}>
+        <div className="constellation-page">
+          <HeaderBar>
+            <div
+              className={
+                "constellation-page__header__menu" +
+                (isSidebarActive ? "--active" : "")
+              }
+              onClick={function (event) {
+                event.stopPropagation();
+                toggleSidebar();
+              }}
+            >
+              {isSidebarActive ? <XMarkIcon /> : <MenuIcon />}
             </div>
-            <div className="content__note">
-              <Outlet />
+          </HeaderBar>
+          <div className="constellation-page__main">
+            <div
+              ref={sidebarRef}
+              className={
+                "constellation-page__main__sidebar" +
+                (isSidebarActive ? "--active" : "")
+              }
+            >
+              <NavigationDrawer />
+            </div>
+            <div className="content">
+              <div className="content__graph">
+                <ConstellationGraph />
+              </div>
+              <div className="content__note">
+                <Outlet />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </ConstellationContext.Provider>
+      </ConstellationContext.Provider>
+    </>
   );
 };

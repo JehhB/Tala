@@ -1,5 +1,6 @@
 import { FunctionComponent, useContext } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import useFetch from "react-fetch-hook";
@@ -31,14 +32,26 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
     );
   } else if (!note.isLoading && note.data) {
     return (
-      <NoteContainer
-        title={note.data.title}
-        color_percent={level / categories.length}
-      >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {note.data.content}
-        </ReactMarkdown>
-      </NoteContainer>
+      <>
+        <Helmet>
+          <title>{note.data.title}</title>
+          <meta
+            name="description"
+            content={
+              constellation.data.notes.find((n) => n.id === note.data!.id)
+                ?.description ?? ""
+            }
+          />
+        </Helmet>
+        <NoteContainer
+          title={note.data.title}
+          color_percent={level / categories.length}
+        >
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {note.data.content}
+          </ReactMarkdown>
+        </NoteContainer>
+      </>
     );
   } else {
     return null;
