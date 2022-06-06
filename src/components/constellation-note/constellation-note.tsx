@@ -23,13 +23,16 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
     [userName, constellationName, noteName]
   );
 
-  const color_percent =
+  const level =
     (categories.find(
       (category) => noteData && category.id === noteData.category_id
-    )?.index ?? 0) / categories.length;
+    )?.index ?? -1) + 1;
 
   return (
-    <NoteContainer title={noteData?.title ?? ""} color_percent={color_percent}>
+    <NoteContainer
+      title={noteData?.title ?? ""}
+      color_percent={level / categories.length}
+    >
       <ReactMarkdown>{noteData?.content ?? ""}</ReactMarkdown>
     </NoteContainer>
   );
