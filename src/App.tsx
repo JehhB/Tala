@@ -6,20 +6,20 @@ import {
 } from "react-router-dom";
 
 import { ConstellationPage } from "./pages";
-import { NoteContainer } from "./components";
+import { ConstellationNote } from "./components";
 
 const App = function () {
   return (
     <Router>
       <Routes>
         <Route index element={<Navigate to="JohnDoe/Constellation" />} />
-        <Route path=":user">
+        <Route path=":userName">
           <Route index element={<Navigate to="./Constellation" />} />
-          <Route path=":constellation" element={<ConstellationPage />}>
+          <Route path=":constellationName" element={<ConstellationPage />}>
             <Route
               caseSensitive
-              path=":notes"
-              element={<NoteContainer title="test" />}
+              path=":noteName"
+              element={<ConstellationNote />}
             />
           </Route>
         </Route>
