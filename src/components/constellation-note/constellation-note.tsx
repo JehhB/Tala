@@ -1,6 +1,7 @@
 import { FunctionComponent, useContext } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import useFetch from "react-fetch-hook";
 
 import { NoteContainer } from "../note-container";
@@ -34,7 +35,9 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
         title={note.data.title}
         color_percent={level / categories.length}
       >
-        <ReactMarkdown>{note.data.content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {note.data.content}
+        </ReactMarkdown>
       </NoteContainer>
     );
   } else {
