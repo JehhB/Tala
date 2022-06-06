@@ -40,3 +40,113 @@
 .note__header__edit {
   margin-left: auto;
 }
+
+.note__body {
+  --ac-color-1: #7881ff;
+  --ac-color-2: #4d5fe1;
+  --ac-color-3: #0a40bb;
+
+  padding: 1rem 2rem;
+}
+
+.note__body > :first-child {
+  margin-top: 0 !important;
+}
+
+.note__body :is(h1, h2, h3, h4, h5, h6) {
+  margin: 1.5rem 0 1rem 0;
+  line-height: 1em;
+}
+
+.note__body :is(p) {
+  margin: 0 0 1rem 0;
+}
+
+.note__body h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--ac-color-1);
+}
+
+.note__body h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--ac-color-1);
+}
+
+.note__body h3 {
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.note__body h4 {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.note__body h5 {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.note__body h6 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ac-color-1);
+}
+
+.note__body em {
+  color: var(--ac-color-2);
+}
+
+.note__body del {
+  color: var(--gray-3);
+}
+
+.note__body strong {
+  color: var(--ac-color-3) !important;
+  font-weight: 500;
+}
+
+.note__body a {
+  color: var(--ac-color-3) !important;
+}
+
+.note__body :is(ol, ul) {
+  padding-left: 2rem;
+  margin: 0 0 1rem 0;
+}
+
+.note__body ol {
+  list-style-type: decimal;
+}
+
+.note__body :is(ol, ul) ol {
+  list-style-type: lower-roman;
+}
+
+.note__body :is(ol, ul) :is(ol, ul) ol {
+  list-style-type: lower-alpha;
+}
+
+.note__body ul {
+  list-style-type: disc;
+}
+
+.note__body :is(ol, ul) ul {
+  list-style-type: circle;
+}
+
+.note__body :is(ol, ul) :is(ol, ul) ul {
+  list-style-type: square;
+}
+
+.note__body li {
+  margin-top: 0.25rem;
+}
+
+.note__body li > p:first-child {
+  margin: 0;
+}
