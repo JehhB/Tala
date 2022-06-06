@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 import { useResponsiveSidebar } from "../../hooks";
 import { ConstellationContext } from "../../contexts";
@@ -18,14 +18,18 @@ import "./constellation-page.css";
 export const ConstellationPage: FunctionComponent<{}> = function () {
   const [sidebarRef, isSidebarActive, toggleSidebar] = useResponsiveSidebar();
 
+  const { user: userName, constellation: constellationName } = useParams();
   const [constellationData, setConstellationData] =
     useState<Constellation | null>(null);
 
-  useEffect(function () {
-    fetch("/api/v1/constellation/test", { method: "GET" })
-      .then((response) => response.json())
-      .then((data) => setConstellationData(data));
-  }, []);
+  useEffect(
+    function () {
+      fetch(`/api/v1/${userName}/${constellationName}`, { method: "GET" })
+        .then((response) => response.json())
+        .then((data) => setConstellationData(data));
+    },
+    [userName, constellationName]
+  );
 
   return (
     <ConstellationContext.Provider

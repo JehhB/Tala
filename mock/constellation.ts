@@ -42,7 +42,7 @@ const generate_response = function (): Constellation {
 
 export default [
   {
-    url: "/api/v1/constellation/:constellationID",
+    url: "/api/v1/:userName/:constellation",
     method: "get",
     statusCode: 200,
     response: generate_response(),
