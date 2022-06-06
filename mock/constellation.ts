@@ -1,8 +1,7 @@
-import { MockMethod } from "vite-plugin-mock";
 import { random, lorem } from "faker";
 import { Constellation, Category, Link } from "../src/utils";
 
-const generate_response = function (): Constellation {
+export const generate_constellation = function (): Constellation {
   const MOCK_CATEGORIES_COUNT = 3;
   const MOCK_NOTES_COUNT = MOCK_CATEGORIES_COUNT * 5;
   const MOCK_LINKS_COUNT = 25;
@@ -39,12 +38,3 @@ const generate_response = function (): Constellation {
     links: links,
   };
 };
-
-export default [
-  {
-    url: "/api/v1/:userName/:constellation",
-    method: "get",
-    statusCode: 200,
-    response: generate_response(),
-  },
-] as MockMethod[];

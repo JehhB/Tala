@@ -1,8 +1,9 @@
 export type Note = {
   id: string;
+  category_id: string;
+  title: string;
   filename: string;
   content: string;
-  category: Category;
 };
 
 export type Link = {
