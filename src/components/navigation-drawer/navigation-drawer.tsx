@@ -13,51 +13,60 @@ import {
   groupBy,
   rgb,
   toValidTitle,
-  Constellation,
 } from "../../utils";
 
 import "./navigation-drawer.css";
 
 export const NavigationDrawer: FunctionComponent<{}> = function () {
-  const constellationData = useContext<Constellation>(ConstellationContext);
+  const constellation = useContext(ConstellationContext);
 
-  const notesData = groupBy(
-    constellationData.notes,
-    (element) => element.category_id
-  );
+  let categories = null;
 
-  const categoriesData = [...constellationData.categories].sort(
-    (a, b) => a.index - b.index
-  );
+  if (constellation.error) {
+    categories = (
+      <h1 style={{ color: "red" }}>{constellation.error.message}</h1>
+    );
+  } else if (!constellation.isLoading && constellation.data) {
+    const constellationData = constellation.data;
 
-  const categories = categoriesData.map((category, index) => (
-    <div key={index} className="category">
-      <div className="category__header">
-        <h2>{category.name}</h2>
+    const notesData = groupBy(
+      constellationData.notes,
+      (element) => element.category_id
+    );
+
+    const categoriesData = [...constellationData.categories].sort(
+      (a, b) => a.index - b.index
+    );
+
+    categories = categoriesData.map((category, index) => (
+      <div key={index} className="category">
+        <div className="category__header">
+          <h2>{category.name}</h2>
+        </div>
+        <nav
+          className="category__nav"
+          style={{
+            borderLeftColor: cssColor(
+              colorPalletGradient((index + 1) / categoriesData.length) ??
+                rgb(255, 0, 0)
+            ),
+          }}
+        >
+          {notesData[category.id].map((note, index) => (
+            <NavLink
+              key={index}
+              to={toValidTitle(note.title)}
+              className={({ isActive }) =>
+                "category__nav__link" + (isActive ? "--active" : "")
+              }
+            >
+              {note.title}
+            </NavLink>
+          ))}
+        </nav>
       </div>
-      <nav
-        className="category__nav"
-        style={{
-          borderLeftColor: cssColor(
-            colorPalletGradient((index + 1) / categoriesData.length) ??
-              rgb(255, 0, 0)
-          ),
-        }}
-      >
-        {notesData[category.id].map((note, index) => (
-          <NavLink
-            key={index}
-            to={toValidTitle(note.title)}
-            className={({ isActive }) =>
-              "category__nav__link" + (isActive ? "--active" : "")
-            }
-          >
-            {note.title}
-          </NavLink>
-        ))}
-      </nav>
-    </div>
-  ));
+    ));
+  }
 
   return (
     <aside className="navigation-drawer">

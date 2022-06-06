@@ -1,39 +1,43 @@
-import { FunctionComponent, useContext, useEffect, useState } from "react";
+import { FunctionComponent, useContext } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import useFetch from "react-fetch-hook";
 
 import { NoteContainer } from "../note-container";
 import { Note } from "../../utils";
 import { ConstellationContext } from "../../contexts";
 
 export const ConstellationNote: FunctionComponent<{}> = function () {
-  const [noteData, setNoteData] = useState<Note | null>(null);
-  const { categories } = useContext(ConstellationContext);
-
   const { userName, constellationName, noteName } = useParams();
-
-  useEffect(
-    function () {
-      fetch(`/api/v1/${userName}/${constellationName}/${noteName}`, {
-        method: "GET",
-      })
-        .then((response) => response.json())
-        .then((data) => setNoteData(data));
-    },
-    [userName, constellationName, noteName]
+  const note = useFetch<Note>(
+    `/api/v1/${userName}/${constellationName}/${noteName}`
   );
+  const constellation = useContext(ConstellationContext);
+
+  if (!constellation.data) return null;
+  const categories = constellation.data.categories;
 
   const level =
     (categories.find(
-      (category) => noteData && category.id === noteData.category_id
+      (category) => note.data && category.id === note.data.category_id
     )?.index ?? -1) + 1;
 
-  return (
-    <NoteContainer
-      title={noteData?.title ?? ""}
-      color_percent={level / categories.length}
-    >
-      <ReactMarkdown>{noteData?.content ?? ""}</ReactMarkdown>
-    </NoteContainer>
-  );
+  if (note.error) {
+    return (
+      <NoteContainer title="error">
+        <h1 style={{ color: "red" }}>note.error.message</h1>
+      </NoteContainer>
+    );
+  } else if (!note.isLoading && note.data) {
+    return (
+      <NoteContainer
+        title={note.data.title}
+        color_percent={level / categories.length}
+      >
+        <ReactMarkdown>{note.data.content}</ReactMarkdown>
+      </NoteContainer>
+    );
+  } else {
+    return null;
+  }
 };
