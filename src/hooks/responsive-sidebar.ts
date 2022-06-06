@@ -13,21 +13,27 @@ export function useResponsiveSidebar(): [
 
   useEffect(
     function () {
-      if (isLaptop) setSidebarActive(false);
-
-      const documentListener = () => {
+      if (isLaptop) {
         setSidebarActive(false);
-      };
-      const sidebarListener = (event: Event) => {
-        event.stopPropagation();
+        return;
+      }
+
+      const documentListener = (event: MouseEvent) => {
+        const target = event.target;
+        if (
+          !(
+            sidebarRef.current &&
+            target instanceof Node &&
+            sidebarRef.current.contains(target)
+          )
+        )
+          setSidebarActive(false);
       };
 
       document.addEventListener("click", documentListener);
-      sidebarRef.current?.addEventListener("click", sidebarListener);
 
       return () => {
         document.removeEventListener("click", documentListener);
-        sidebarRef.current?.removeEventListener("click", sidebarListener);
       };
     },
     [isLaptop]
