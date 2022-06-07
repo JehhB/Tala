@@ -202,3 +202,19 @@
 .note__body :is(sup a, .data-footnote-backref) {
   text-decoration: none;
 }
+
+.note__body pre code {
+  background-color: var(--bg-color);
+  padding: 1rem;
+  border-radius: 4px;
+  white-space: pre;
+  font-family: "Roboto mono", monospace;
+}
+
+.note__body p code {
+  background-color: var(--bg-color);
+  font-size: 0.85rem;
+  padding: 0.125rem 0.25rem;
+  border-radius: 4px;
+  font-family: "Roboto mono", monospace;
+}

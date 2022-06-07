@@ -10,6 +10,8 @@ import { NoteContainer } from "../note-container";
 import { Note } from "../../utils";
 import { ConstellationContext } from "../../contexts";
 
+import "highlight.js/styles/googlecode.css";
+
 export const ConstellationNote: FunctionComponent<{}> = function () {
   const { userName, constellationName, noteName } = useParams();
   const note = useFetch<Note>(
