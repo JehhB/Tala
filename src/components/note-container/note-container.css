@@ -150,3 +150,55 @@
 .note__body li > p:first-child {
   margin: 0;
 }
+
+.note__body table {
+  border-collapse: collapse;
+}
+
+.note__body :is(th, td){
+  border-top: 1px solid var(--gray-1);
+  border-bottom: 1px solid var(--gray-1);
+}
+
+.note__body :is(th, td):first-child {
+  border-left: 1px solid var(--gray-1);
+}
+
+.note__body :is(th, td):last-child {
+  border-right: 1px solid var(--gray-1);
+}
+
+.note__body tbody tr:nth-child(2n) {
+  background-color: var(--bg-color);
+}
+
+.note__body th {
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+}
+
+.note__body td {
+  padding: 0.375rem 1rem;
+}
+
+.note__body blockquote {
+  padding: 0 1rem;
+  margin: 0 0 1rem 0;
+  border-left: 0.25rem solid var(--gray-1);
+  color: var(--gray-3);
+}
+
+.note__body hr {
+  border: 0.5px solid var(--gray-1);
+}
+
+.note__body .footnotes {
+  font-size: 0.75rem;
+  border-top: 1px solid var(--gray-1);
+  padding-top: 0.5rem;
+  color: var(--gray-3);
+}
+
+.note__body :is(sup a, .data-footnote-backref) {
+  text-decoration: none;
+}
