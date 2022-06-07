@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHightlight from "rehype-highlight";
 import useFetch from "react-fetch-hook";
 
 import { NoteContainer } from "../note-container";
@@ -47,7 +48,10 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
           title={note.data.title}
           color_percent={level / categories.length}
         >
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeHightlight]}
+          >
             {note.data.content}
           </ReactMarkdown>
         </NoteContainer>
