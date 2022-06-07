@@ -1,15 +1,15 @@
-type rgba = {
+export type RGBA = {
   r: number;
   g: number;
   b: number;
-  a?: number;
+  a: number;
 };
 
-export function rgba(r: number, g: number, b: number, a: number): rgba {
+export function rgba(r: number, g: number, b: number, a: number): RGBA {
   return { r, g, b, a };
 }
 
-export function rgb(r: number, g: number, b: number): rgba {
+export function rgb(r: number, g: number, b: number): RGBA {
   return rgba(r, g, b, 1.0);
 }
 
@@ -17,11 +17,11 @@ export function hex(color: number) {
   return rgb((color >> 16) & 255, (color >> 8) & 255, color & 255);
 }
 
-export function cssColor({ r, g, b, a }: rgba) {
+export function cssColor({ r, g, b, a }: RGBA) {
   return `rgba(${r},${g},${b},${a ?? 1.0})`;
 }
 
-export function gradient(colors: rgba[], percent: number): rgba | null {
+export function gradient(colors: RGBA[], percent: number): RGBA | null {
   if (colors.length == 0 || percent < 0.0 || percent > 1.0) return null;
   if (colors.length == 1) return colors[0];
   if (percent == 1.0) return colors[colors.length - 1];
@@ -49,6 +49,6 @@ export const colorPallet = [
   hex(0xf9f871),
 ];
 
-export function colorPalletGradient(p: number): rgba | null {
+export function colorPalletGradient(p: number): RGBA | null {
   return gradient(colorPallet, p);
 }
