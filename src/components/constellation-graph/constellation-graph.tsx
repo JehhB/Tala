@@ -25,6 +25,7 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
     <NetworkGraph
       nodes={notes
         .map((note) => ({
+          id: note.id,
           label: note.title,
           description: note.description,
           color: getCategoryColor(note.category_id),
@@ -33,17 +34,16 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
           (
             node
           ): node is {
+            id: string;
             label: string;
             description: string | undefined;
             color: RGBA;
           } => node.color !== null
         )}
-      links={links
-        .map((link) => ({
-          to: notes.findIndex((note) => link.noteID === note.id),
-          from: notes.findIndex((note) => link.referenceID === note.id),
-        }))
-        .filter((link) => link.to === -1 || link.from === -1)}
+      links={links.map((link) => ({
+        source: link.noteID,
+        target: link.referenceID,
+      }))}
     />
   );
 };

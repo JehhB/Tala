@@ -1,29 +1,63 @@
 import { FunctionComponent, useRef, useEffect } from "react";
 import * as d3 from "d3";
+import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
 
-import { RGBA, cssColor, mulberry32 as rng } from "../../utils";
+import { RGBA, cssColor } from "../../utils";
+
+export interface Node extends SimulationNodeDatum {
+  id: string;
+  label: string;
+  color: RGBA;
+  description?: string;
+}
+
+export type Link = SimulationLinkDatum<Node>;
 
 type NetworkGraphProp = {
-  nodes: { label: string; color: RGBA; description?: string }[];
-  links: { from: number; to: number }[];
+  nodes: Node[];
+  links: Link[];
 };
 
-export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function ({
-  nodes,
-  links,
-}) {
+export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
+  props
+) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const SPREAD = 20;
-  const RAND_SEED = 19;
 
   useEffect(
     function () {
       if (!svgRef.current) return;
 
       const svg = d3.select(svgRef.current);
-      const rand = rng(RAND_SEED);
 
-      svg
+      const nodes = props.nodes;
+      const links = d3
+        .map(props.links, (link) => ({
+          source: nodes.find((node) => node.id === link.source),
+          target: nodes.find((node) => node.id === link.target),
+        }))
+        .filter(
+          (link): link is { source: Node; target: Node } =>
+            link.source !== undefined && link.target !== undefined
+        );
+
+      const simulation = d3
+        .forceSimulation(nodes)
+        .force(
+          "link",
+          d3.forceLink(links).id((_, i) => nodes[i].id)
+        )
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter())
+        .on("end", ticked);
+
+      const link = svg
+        .selectAll("line")
+        .data(links)
+        .enter()
+        .append("line")
+        .style("stroke", "#aaa");
+
+      const node = svg
         .selectAll("circle")
         .data(nodes)
         .enter()
@@ -31,11 +65,19 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function ({
         .attr("fill", (node) => cssColor(node.color))
         .attr("r", "0.75em")
         .attr("stroke", "#000000")
-        .attr("stroke-width", "1px")
-        .attr("cx", () => rand() * SPREAD - SPREAD / 2 + "em")
-        .attr("cy", () => rand() * SPREAD - SPREAD / 2 + "em");
+        .attr("stroke-width", "1px");
+
+      function ticked() {
+        link
+          .attr("x1", (d) => d.source.x!)
+          .attr("y1", (d) => d.source.y!)
+          .attr("x2", (d) => d.target.x!)
+          .attr("y2", (d) => d.target.y!);
+
+        node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+      }
     },
-    [nodes.length, links.length]
+    [props.nodes.length, props.links.length]
   );
 
   useEffect(
