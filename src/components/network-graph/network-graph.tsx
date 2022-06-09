@@ -1,7 +1,7 @@
 import { FunctionComponent, useRef, useEffect } from "react";
 import * as d3 from "d3";
 
-import { RGBA, cssColor } from "../../utils";
+import { RGBA, cssColor, mulberry32 as rng } from "../../utils";
 
 type NetworkGraphProp = {
   nodes: { label: string; color: RGBA; description?: string }[];
@@ -13,12 +13,15 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function ({
   links,
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const SPREAD = 20;
+  const RAND_SEED = 19;
 
   useEffect(
     function () {
       if (!svgRef.current) return;
+
       const svg = d3.select(svgRef.current);
-      const INIT_DIST = 5;
+      const rand = rng(RAND_SEED);
 
       svg
         .selectAll("circle")
@@ -29,16 +32,8 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function ({
         .attr("r", "0.75em")
         .attr("stroke", "#000000")
         .attr("stroke-width", "1px")
-        .attr(
-          "cx",
-          (_, i) =>
-            Math.cos((Math.PI * 2 * i) / nodes.length) * INIT_DIST + "em"
-        )
-        .attr(
-          "cy",
-          (_, i) =>
-            Math.sin((Math.PI * 2 * i) / nodes.length) * INIT_DIST + "em"
-        );
+        .attr("cx", () => rand() * SPREAD - SPREAD / 2 + "em")
+        .attr("cy", () => rand() * SPREAD - SPREAD / 2 + "em");
     },
     [nodes.length, links.length]
   );
