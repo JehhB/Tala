@@ -18,8 +18,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function ({
     function () {
       if (!svgRef.current) return;
       const svg = d3.select(svgRef.current);
-
-      svg.attr("width", "100%").attr("height", "100%");
+      const INIT_DIST = 5;
 
       svg
         .selectAll("circle")
@@ -27,7 +26,19 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function ({
         .enter()
         .append("circle")
         .attr("fill", (node) => cssColor(node.color))
-        .attr("r", "0.5em");
+        .attr("r", "0.75em")
+        .attr("stroke", "#000000")
+        .attr("stroke-width", "1px")
+        .attr(
+          "cx",
+          (_, i) =>
+            Math.cos((Math.PI * 2 * i) / nodes.length) * INIT_DIST + "em"
+        )
+        .attr(
+          "cy",
+          (_, i) =>
+            Math.sin((Math.PI * 2 * i) / nodes.length) * INIT_DIST + "em"
+        );
     },
     [nodes.length, links.length]
   );
@@ -56,5 +67,12 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function ({
     [svgRef]
   );
 
-  return <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg"></svg>;
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      ref={svgRef}
+      xmlns="http://www.w3.org/2000/svg"
+    ></svg>
+  );
 };
