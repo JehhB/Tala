@@ -4,6 +4,12 @@ import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
 
 import { RGBA, cssColor } from "../../utils";
 
+const NODE_RADIUS = 12;
+const NODE_REPULSION = 80;
+const NODE_MARGIN = 2.5;
+const LINK_LENGHT = 100;
+const NODE_GRAVITY = 1.2;
+
 export interface Node extends SimulationNodeDatum {
   id: string;
   label: string;
@@ -26,10 +32,14 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
   useEffect(
     function () {
       if (!svgRef.current) return;
-
       const svg = d3.select(svgRef.current);
 
-      const nodes = props.nodes;
+      const nodes = d3.map(
+        props.nodes,
+        (node): Node => ({
+          ...node,
+        })
+      );
       const links = d3
         .map(props.links, (link) => ({
           source: nodes.find((node) => node.id === link.source),
@@ -44,11 +54,15 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .forceSimulation(nodes)
         .force(
           "link",
-          d3.forceLink(links).id((_, i) => nodes[i].id)
+          d3
+            .forceLink(links)
+            .id((_, i) => nodes[i].id)
+            .distance(LINK_LENGHT)
         )
-        .force("charge", d3.forceManyBody())
-        .force("center", d3.forceCenter())
-        .on("end", ticked);
+        .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
+        .force("center", d3.forceCenter().strength(NODE_GRAVITY))
+        .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
+        .on("tick", ticked);
 
       const link = svg
         .selectAll("line")
@@ -63,9 +77,9 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .enter()
         .append("circle")
         .attr("fill", (node) => cssColor(node.color))
-        .attr("r", "0.75em")
+        .attr("r", NODE_RADIUS)
         .attr("stroke", "#000000")
-        .attr("stroke-width", "1px");
+        .attr("stroke-width", 1);
 
       function ticked() {
         link
@@ -76,6 +90,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
 
         node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
       }
+      ticked();
     },
     [props.nodes.length, props.links.length]
   );
