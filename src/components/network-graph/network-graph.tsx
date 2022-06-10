@@ -76,6 +76,13 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .data(nodes)
         .enter()
         .append("circle")
+        .call(
+          d3
+            .drag<SVGCircleElement, Node>()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        )
         .attr("fill", (node) => cssColor(node.color))
         .attr("r", NODE_RADIUS)
         .attr("stroke", "#000000")
@@ -90,6 +97,24 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
 
         node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
       }
+
+      function dragstarted(event: any, d: Node) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(event: any, d: Node) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+
+      function dragended(event: any, d: Node) {
+        if (!event.active) simulation.alphaTarget(0.0001);
+        d.fx = null;
+        d.fy = null;
+      }
+
       ticked();
     },
     [props.nodes.length, props.links.length]
