@@ -5,10 +5,10 @@ import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
 import { RGBA, cssColor } from "../../utils";
 
 const NODE_RADIUS = 12;
-const NODE_REPULSION = 80;
+const NODE_REPULSION = 60;
 const NODE_MARGIN = 2.5;
 const LINK_LENGHT = 100;
-const NODE_GRAVITY = 1.2;
+const NODE_GRAVITY = 0.005;
 
 export interface Node extends SimulationNodeDatum {
   id: string;
@@ -60,7 +60,9 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
             .distance(LINK_LENGHT)
         )
         .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
-        .force("center", d3.forceCenter().strength(NODE_GRAVITY))
+        .force("center", d3.forceCenter())
+        .force("forceX", d3.forceX().strength(NODE_GRAVITY))
+        .force("forceY", d3.forceY().strength(NODE_GRAVITY))
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
         .on("tick", ticked);
 
