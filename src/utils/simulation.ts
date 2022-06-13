@@ -1,3 +1,9 @@
+function getAngle(x: number, y: number) {
+  if (x !== 0) return Math.tan(x / y);
+  if (y < 0) return -Math.PI / 2;
+  return Math.PI / 2;
+}
+
 export type Point = {
   x?: number;
   y?: number;
@@ -25,6 +31,7 @@ export class Simulation<Body extends Point> {
     this.bodies = bodies.map(
       (body, i) =>
         ({
+          ...body,
           x: body.x ?? 0,
           y: body.y ?? 0,
           vx: body.vx ?? 0,
@@ -47,17 +54,20 @@ export class Simulation<Body extends Point> {
       body.fx = body.fy = 0;
       this.forceGenerators.forEach((forceGenerator) => {
         const { fx, fy } = forceGenerator(body, this.bodies, delta);
+        console.log({ forceGenerator, fx, fy });
         body.fx! += fx;
         body.fy! += fy;
       });
     });
   }
 
-  activity(scale: number = 20): number {
+  activity(scale: number = 1): number {
+    if (this.bodies.length < 1) return 0;
+
     return (
       this.bodies
         .map(({ fx, fy }) =>
-          Math.sqrt((fx! * fx! + fy! * fy!) / (scale * scale))
+          Math.sqrt((fx! * fx! + fy! * fy!) * (scale * scale))
         )
         .reduce((a, b) => a + b) / this.bodies.length
     );
@@ -107,7 +117,7 @@ export const forceLink = function <Body extends Point>(
       .map(({ x: x1, y: y1 }) => ({ x: x1! - x0!, y: y1! - y0! }))
       .map(({ x, y }) => ({
         delta: Math.sqrt(x * x + y * y) - length,
-        angle: Math.atan(y / x),
+        angle: getAngle(x, y),
       }))
       .filter(({ delta }) => delta * delta > minDeltaSq!)
       .map(({ delta, angle }) => ({
@@ -124,6 +134,7 @@ export const forceLink = function <Body extends Point>(
 
 export const forceCharges = function (
   charge: number,
+  minDistance: number = 0.5,
   coulombConstant: number = 1
 ): ForceGenerator<Point> {
   return function ({ x: x0, y: y0 }, bodies) {
@@ -131,7 +142,11 @@ export const forceCharges = function (
       .map(({ x, y }) => ({ x: x! - x0!, y: y! - y0! }))
       .map(({ x, y }) => ({
         r: Math.sqrt(x * x + y * y),
-        angle: Math.tan(y / x),
+        angle: getAngle(x, y),
+      }))
+      .map(({ r, angle }) => ({
+        r: r < minDistance ? minDistance : r,
+        angle,
       }))
       .map(({ r, angle }) => ({
         f: (coulombConstant * charge * charge) / (r * r),
