@@ -1,5 +1,11 @@
+import { mulberry32 } from "./random";
+
+const RAND_SEED = 19;
+const random = mulberry32(RAND_SEED);
+
 function getAngle(x: number, y: number) {
   if (x !== 0) return Math.tan(x / y);
+  if (y == 0) return random() * Math.PI * 2;
   if (y < 0) return -Math.PI / 2;
   return Math.PI / 2;
 }
@@ -16,8 +22,8 @@ export type Point = {
 
 export type ForceGenerator<Body extends Point> = (
   body: Body,
-  bodies: Body[],
-  delta: number
+  index: number,
+  bodies: Body[]
 ) => {
   fx: number;
   fy: number;
@@ -45,19 +51,18 @@ export class Simulation<Body extends Point> {
   }
 
   advance(delta: number): void {
-    this.bodies.forEach((body) => {
-      body.x! += body.vx! * delta;
-      body.y! += body.vy! * delta;
-      body.vx! += body.fx! * delta;
-      body.vy! += body.fy! * delta;
-
+    this.bodies.forEach((body, i) => {
       body.fx = body.fy = 0;
       this.forceGenerators.forEach((forceGenerator) => {
-        const { fx, fy } = forceGenerator(body, this.bodies, delta);
-        console.log({ forceGenerator, fx, fy });
+        const { fx, fy } = forceGenerator(body, i, this.bodies);
         body.fx! += fx;
         body.fy! += fy;
       });
+
+      body.x! += body.vx! * delta + 0.5 * body.fx * delta * delta;
+      body.y! += body.vy! * delta + 0.5 * body.fy * delta * delta;
+      body.vx! += body.fx! * delta;
+      body.vy! += body.fy! * delta;
     });
   }
 
@@ -65,11 +70,11 @@ export class Simulation<Body extends Point> {
     if (this.bodies.length < 1) return 0;
 
     return (
-      this.bodies
-        .map(({ fx, fy }) =>
-          Math.sqrt((fx! * fx! + fy! * fy!) * (scale * scale))
-        )
-        .reduce((a, b) => a + b) / this.bodies.length
+      (this.bodies
+        .map(({ fx, fy }) => Math.sqrt(fx! * fx! + fy! * fy!))
+        .reduce((a, b) => a + b) /
+        this.bodies.length) *
+      scale
     );
   }
 }
@@ -78,12 +83,16 @@ export const forceCenter = function (
   origin: {
     x: number;
     y: number;
-  } = { x: 0, y: 0 }
+  } = { x: 0, y: 0 },
+  gravitaitonalConstant: number = 0.5
 ): ForceGenerator<Point> {
   return function ({ x, y }: Point) {
-    const deltaX = x! - origin.x;
-    const deltaY = y! - origin.y;
-    return { fx: deltaX * deltaX, fy: deltaY * deltaY };
+    const deltaX = origin.x - x!;
+    const deltaY = origin.y - y!;
+    return {
+      fx: gravitaitonalConstant * deltaX,
+      fy: gravitaitonalConstant * deltaY,
+    };
   };
 };
 
@@ -97,7 +106,7 @@ export const forceLink = function <Body extends Point>(
   const mem = new Map<Body, Body[]>();
   if (minDeltaSq === undefined) minDeltaSq = (length / 20) * (length / 20);
 
-  return (body, bodies) => {
+  return (body, _i, bodies) => {
     const sources = links
       .filter(({ target }) => target === id(body))
       .map(({ source }) => source);
@@ -134,11 +143,13 @@ export const forceLink = function <Body extends Point>(
 
 export const forceCharges = function (
   charge: number,
-  minDistance: number = 0.5,
-  coulombConstant: number = 1
+  minDistance: number = 5,
+  maxDistance: number = 10000,
+  coulombConstant: number = 0.5
 ): ForceGenerator<Point> {
-  return function ({ x: x0, y: y0 }, bodies) {
+  return function ({ x: x0, y: y0 }, i, bodies) {
     const forces = bodies
+      .filter((_, idx) => idx !== i)
       .map(({ x, y }) => ({ x: x! - x0!, y: y! - y0! }))
       .map(({ x, y }) => ({
         r: Math.sqrt(x * x + y * y),
@@ -157,9 +168,12 @@ export const forceCharges = function (
         fy: f * Math.sin(angle),
       }));
 
-    return forces.reduce((prev, curr) => ({
-      fx: prev.fx + curr.fx,
-      fy: prev.fy + curr.fy,
-    }));
+    return forces.reduce(
+      (prev, curr) => ({
+        fx: prev.fx + curr.fx,
+        fy: prev.fy + curr.fy,
+      }),
+      { fx: 0, fy: 0 }
+    );
   };
 };
