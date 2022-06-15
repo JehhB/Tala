@@ -20,32 +20,220 @@ export type Point = {
   index?: number;
 };
 
+class Rectangle {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+
+  constructor(center: Point, dimensions: { w: number; h: number }) {
+    this.x = center.x ?? 0;
+    this.y = center.y ?? 0;
+    this.w = dimensions.w;
+    this.h = dimensions.h;
+  }
+
+  contains({ x, y }: Point): boolean {
+    const { x: x0, y: y0, w, h } = this;
+    if (x === undefined || y === undefined) return false;
+    return (
+      x >= x0 - w / 2 && x < x0 + w / 2 && y >= y0 - h / 2 && y < y0 + h / 2
+    );
+  }
+
+  intersects({ x: x0, y: y0, w: w0, h: h0 }: Rectangle): boolean {
+    const { x: x1, y: y1, w: w1, h: h1 } = this;
+    return (
+      x0 + w0 / 2 >= x1 - w1 / 2 &&
+      x1 + w1 / 2 >= x0 - w0 / 2 &&
+      y0 + h0 / 2 >= y1 - h1 / 2 &&
+      y1 + h1 / 2 >= y0 - h0 / 2
+    );
+  }
+}
+
+class QuadTree<Body extends Point> {
+  nodes: QuadTree<Body>[] | null;
+  agents: Body[] | null;
+  bounds: Rectangle;
+  length: number;
+  capacity: number;
+  maxDepth: number;
+
+  constructor(
+    agents: Body[],
+    bounds: Rectangle,
+    options?: { capacity?: number; maxDepth?: number }
+  ) {
+    this.nodes = null;
+    this.agents = new Array();
+    this.bounds = bounds;
+    this.length = 0;
+    this.capacity = options?.capacity ?? 4;
+    this.maxDepth = options?.maxDepth ?? 10;
+
+    agents.forEach((agent) => {
+      this.insert(agent);
+    });
+  }
+
+  merge(): boolean {
+    if (this.nodes === null) return false;
+
+    this.nodes.forEach((node) => {
+      node.merge();
+    });
+
+    this.agents = this.nodes.reduce(
+      (prev, curr) => prev.concat(curr.agents!),
+      new Array<Body>()
+    );
+    this.nodes = null;
+    return true;
+  }
+
+  private split(): boolean {
+    if (this.maxDepth <= 1) return false;
+    if (this.nodes !== null) return true;
+
+    const { x, y, w, h } = this.bounds;
+    this.nodes = new Array(4);
+
+    const dimensions = { w: w / 2, h: h / 2 };
+    const options = { capacity: this.capacity, maxDepth: this.maxDepth - 1 };
+    const nw = { x: x - w / 4, y: y - h / 4 };
+    const ne = { x: x + w / 4, y: y - h / 4 };
+    const sw = { x: x - w / 4, y: y + h / 4 };
+    const se = { x: x + w / 4, y: y + h / 4 };
+
+    this.nodes[0] = new QuadTree(
+      this.agents!,
+      new Rectangle(nw, dimensions),
+      options
+    );
+    this.nodes[1] = new QuadTree(
+      this.agents!,
+      new Rectangle(ne, dimensions),
+      options
+    );
+    this.nodes[2] = new QuadTree(
+      this.agents!,
+      new Rectangle(sw, dimensions),
+      options
+    );
+    this.nodes[3] = new QuadTree(
+      this.agents!,
+      new Rectangle(se, dimensions),
+      options
+    );
+
+    this.agents = null;
+
+    return true;
+  }
+
+  insert(agent: Body): boolean {
+    if (!this.bounds.contains(agent)) return false;
+
+    this.length = this.length + 1;
+    if (this.length > this.capacity && this.split())
+      return this.nodes!.map((n) => n.insert(agent)).reduce((a, b) => a || b);
+
+    this.agents!.push(agent);
+    return true;
+  }
+
+  select(bound: Rectangle = this.bounds): Body[] {
+    if (!bound.intersects(this.bounds)) return [];
+    if (this.nodes === null) return this.agents!;
+
+    return this.nodes.reduce(
+      (prev, curr) => prev.concat(curr.select(bound)),
+      new Array<Body>()
+    );
+  }
+
+  update(t: number): Body[] {
+    if (this.agents !== null) {
+      this.agents.forEach((agent) => {
+        agent.x! += agent.vx! * t + 0.5 * agent.fx! * t * t;
+        agent.y! += agent.vy! * t + 0.5 * agent.fy! * t * t;
+        agent.vx! += agent.fx! * t;
+        agent.vy! += agent.fy! * t;
+      });
+
+      const outOfBounds = this.agents.filter(
+        (agent) => !this.bounds.contains(agent)
+      );
+      this.agents = this.agents.filter((agent) => this.bounds.contains(agent));
+      this.length = this.agents.length;
+
+      return outOfBounds;
+    }
+
+    const moved = this.nodes!.reduce(
+      (prev, curr) => prev.concat(curr.update(t)),
+      new Array<Body>()
+    );
+
+    const outOfBounds = moved.filter((agent) => !this.bounds.contains(agent));
+    this.length -= outOfBounds.length;
+
+    if (this.length <= this.capacity) this.merge();
+    else {
+      moved
+        .filter((agent) => this.bounds.contains(agent))
+        .forEach((agent) => {
+          this.nodes!.forEach((node) => node.insert(agent));
+        });
+    }
+
+    return outOfBounds;
+  }
+
+  forEach(callbackfn: (agent: Body, index: number) => void): void {
+    if (this.nodes === null) {
+      this.agents!.forEach((agent) => {
+        callbackfn(agent, agent.index ?? -1);
+      });
+      return;
+    }
+
+    this.nodes!.forEach((node) => {
+      node.forEach(callbackfn);
+    });
+  }
+}
+
 export type ForceGenerator<Body extends Point> = (
   body: Body,
   index: number,
-  bodies: Body[]
+  bodies: QuadTree<Body>
 ) => {
   fx: number;
   fy: number;
 };
 
 export class Simulation<Body extends Point> {
-  readonly bodies: Body[];
+  readonly bodies: QuadTree<Body>;
   readonly forceGenerators: ForceGenerator<Body>[];
 
   constructor(bodies: Body[], forceGenerators: ForceGenerator<Body>[]) {
-    this.bodies = bodies.map(
-      (body, i) =>
-        ({
-          ...body,
-          x: body.x ?? 0,
-          y: body.y ?? 0,
-          vx: body.vx ?? 0,
-          vy: body.vy ?? 0,
-          fx: body.fx ?? 0,
-          fy: body.fy ?? 0,
-          index: body.index ?? i,
-        } as Body)
+    this.bodies = new QuadTree(
+      bodies.map(
+        (body, i) =>
+          ({
+            ...body,
+            x: body.x ?? 0,
+            y: body.y ?? 0,
+            vx: body.vx ?? 0,
+            vy: body.vy ?? 0,
+            fx: body.fx ?? 0,
+            fy: body.fy ?? 0,
+            index: i,
+          } as Body)
+      ),
+      new Rectangle({ x: 0, y: 0 }, { w: 8000, h: 8000 })
     );
     this.forceGenerators = forceGenerators;
   }
@@ -58,12 +246,8 @@ export class Simulation<Body extends Point> {
         body.fx! += fx;
         body.fy! += fy;
       });
-
-      body.x! += body.vx! * delta + 0.5 * body.fx * delta * delta;
-      body.y! += body.vy! * delta + 0.5 * body.fy * delta * delta;
-      body.vx! += body.fx! * delta;
-      body.vy! += body.fy! * delta;
     });
+    this.bodies.update(delta);
   }
 
   activity(scale: number = 1): number {
@@ -71,6 +255,7 @@ export class Simulation<Body extends Point> {
 
     return (
       (this.bodies
+        .select()
         .map(({ fx, fy }) => Math.sqrt(fx! * fx! + fy! * fy!))
         .reduce((a, b) => a + b) /
         this.bodies.length) *
@@ -114,9 +299,12 @@ export const forceLink = function <Body extends Point>(
     if (mem.get(body) === undefined) {
       mem.set(
         body,
-        bodies.filter(
-          (body) => sources.find((source) => source === id(body)) !== undefined
-        )
+        bodies
+          .select()
+          .filter(
+            (body) =>
+              sources.find((source) => source === id(body)) !== undefined
+          )
       );
     }
 
@@ -149,6 +337,9 @@ export const forceCharges = function (
 ): ForceGenerator<Point> {
   return function ({ x: x0, y: y0 }, i, bodies) {
     const forces = bodies
+      .select(
+        new Rectangle({ x: x0, y: y0 }, { w: maxDistance, h: maxDistance })
+      )
       .filter((_, idx) => idx !== i)
       .map(({ x, y }) => ({ x: x! - x0!, y: y! - y0! }))
       .map(({ x, y }) => ({
