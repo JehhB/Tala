@@ -153,6 +153,20 @@ class QuadTree<Body extends Point> {
     );
   }
 
+  private seperate(agents: Body[]): { out: Body[]; inside: Body[] } {
+    const out = new Array<Body>();
+    const inside = new Array<Body>();
+
+    agents.forEach((agent) => {
+      if (this.bounds.contains(agent)) {
+        inside.push(agent);
+      } else {
+        out.push(agent);
+      }
+    });
+    return { out, inside };
+  }
+
   update(t: number): Body[] {
     if (this.agents !== null) {
       this.agents.forEach((agent) => {
@@ -162,33 +176,30 @@ class QuadTree<Body extends Point> {
         agent.vy! += agent.fy! * t;
       });
 
-      const outOfBounds = this.agents.filter(
-        (agent) => !this.bounds.contains(agent)
-      );
-      this.agents = this.agents.filter((agent) => this.bounds.contains(agent));
+      const { inside, out } = this.seperate(this.agents);
+      this.agents = inside;
       this.length = this.agents.length;
 
-      return outOfBounds;
+      return out;
     }
 
     const moved = this.nodes!.reduce(
-      (prev, curr) => prev.concat(curr.update(t)),
+      (acc, node) => acc.concat(node.update(t)),
       new Array<Body>()
     );
 
-    const outOfBounds = moved.filter((agent) => !this.bounds.contains(agent));
-    this.length -= outOfBounds.length;
+    const { inside, out } = this.seperate(moved);
+    this.length -= out.length;
 
-    if (this.length <= this.capacity) this.merge();
-    else {
-      moved
-        .filter((agent) => this.bounds.contains(agent))
-        .forEach((agent) => {
-          this.nodes!.forEach((node) => node.insert(agent));
-        });
+    if (this.length <= this.capacity) {
+      this.merge();
+    } else {
+      inside.forEach((agent) => {
+        this.nodes!.forEach((node) => node.insert(agent));
+      });
     }
 
-    return outOfBounds;
+    return out;
   }
 
   forEach(callbackfn: (agent: Body, index: number) => void): void {
@@ -238,7 +249,7 @@ export class Simulation<Body extends Point> {
     this.forceGenerators = forceGenerators;
   }
 
-  advance(delta: number): void {
+  advance(delta: number): Body[] {
     this.bodies.forEach((body, i) => {
       body.fx = body.fy = 0;
       this.forceGenerators.forEach((forceGenerator) => {
@@ -247,7 +258,7 @@ export class Simulation<Body extends Point> {
         body.fy! += fy;
       });
     });
-    this.bodies.update(delta);
+    return this.bodies.update(delta);
   }
 
   activity(scale: number = 1): number {
