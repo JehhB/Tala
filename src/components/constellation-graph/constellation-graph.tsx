@@ -2,7 +2,7 @@ import { FunctionComponent, useContext } from "react";
 
 import { NetworkGraph } from "../network-graph";
 import { ConstellationContext } from "../../contexts";
-import { RGBA, colorPalletGradient, rgb } from "../../utils";
+import { RGBA, colorPalletGradient, rgb, toValidTitle } from "../../utils";
 
 export const ConstellationGraph: FunctionComponent<{}> = function () {
   const constellation = useContext(ConstellationContext);
@@ -29,6 +29,7 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
           label: note.title,
           description: note.description,
           color: getCategoryColor(note.category_id),
+          to: toValidTitle(note.title),
         }))
         .filter(
           (
@@ -38,6 +39,7 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
             label: string;
             description: string | undefined;
             color: RGBA;
+            to: string;
           } => node.color !== null
         )}
       links={links.map((link) => ({

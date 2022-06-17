@@ -1,4 +1,5 @@
 import { FunctionComponent, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import * as d3 from "d3";
 import {
   SimulationNodeDatum,
@@ -19,6 +20,7 @@ const NODE_GRAVITY = 0.005;
 export interface Node extends SimulationNodeDatum {
   id: string;
   label: string;
+  to: string;
   color: RGBA;
   description?: string;
 }
@@ -63,6 +65,7 @@ const drag = function <
 export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
   props
 ) {
+  const navigate = useNavigate();
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(
@@ -115,6 +118,9 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .enter()
         .append("circle")
         .call(drag<SVGCircleElement, Node>(simulation))
+        .on("click", (_, d) => {
+          navigate(d.to);
+        })
         .attr("fill", (node) => cssColor(node.color))
         .attr("r", NODE_RADIUS)
         .attr("stroke", "#000000")
