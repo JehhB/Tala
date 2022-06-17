@@ -10,9 +10,9 @@ import {
 
 import { RGBA, cssColor } from "../../utils";
 
-const NODE_RADIUS = 12;
-const NODE_REPULSION = 60;
-const NODE_MARGIN = 2.5;
+const NODE_RADIUS = 8;
+const NODE_REPULSION = 90;
+const NODE_MARGIN = 1.5;
 const LINK_LENGHT = 100;
 const NODE_GRAVITY = 0.005;
 
@@ -129,6 +129,11 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
 
         node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
       }
+
+      return () => {
+        node.remove();
+        link.remove();
+      };
     },
     [props.nodes.length, props.links.length]
   );
