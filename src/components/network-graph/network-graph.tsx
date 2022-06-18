@@ -11,6 +11,8 @@ import {
 
 import { RGBA, cssColor } from "../../utils";
 
+import "./network-graph.css";
+
 const NODE_RADIUS = 8;
 const NODE_REPULSION = 90;
 const NODE_MARGIN = 1.5;
@@ -105,26 +107,40 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
         .on("tick", ticked);
 
-      const link = svg
+      const linkGroup = svg.append("g").attr("class", "links");
+      const link = linkGroup
         .selectAll("line")
         .data(links)
         .enter()
         .append("line")
+        .attr("class", "link")
         .style("stroke", "#aaa");
 
-      const node = svg
+      const nodeGroup = svg.append("g").attr("class", "nodes");
+      const node = nodeGroup
         .selectAll("circle")
         .data(nodes)
         .enter()
+        .append("g")
+        .attr("class", "node")
+        .call(drag(simulation));
+
+      const circle = node
         .append("circle")
-        .call(drag<SVGCircleElement, Node>(simulation))
         .on("click", (_, d) => {
           navigate(d.to);
         })
         .attr("fill", (node) => cssColor(node.color))
         .attr("r", NODE_RADIUS)
-        .attr("stroke", "#000000")
-        .attr("stroke-width", 1);
+        .attr("stroke", "#000000");
+
+      const label = node
+        .append("text")
+        .text(({ label }) => label)
+        .attr("text-anchor", "middle")
+        .attr("y", 3 * NODE_RADIUS);
+
+      const title = node.append("title").text(({ label }) => label);
 
       function ticked() {
         link
@@ -133,12 +149,12 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
           .attr("x2", (d) => d.target.x!)
           .attr("y2", (d) => d.target.y!);
 
-        node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+        node.attr("transform", ({ x, y }) => `translate(${x},${y})`);
       }
 
       return () => {
-        node.remove();
-        link.remove();
+        nodeGroup.remove();
+        linkGroup.remove();
       };
     },
     [props.nodes.length, props.links.length]
