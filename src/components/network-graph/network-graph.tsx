@@ -73,11 +73,26 @@ const zoomAndPan = function <
 >(
   child: Selection<ChildElement, unknown, null, undefined>
 ): ZoomBehavior<ZoomElement, unknown> {
+  const zoom = d3.zoom<ZoomElement, unknown>();
+  let zooming = false;
+
+  const zoomstarted = function () {
+    zooming = true;
+  };
+
   const zoomed = function ({ transform }: any) {
     child.attr("transform", transform);
   };
 
-  return d3.zoom<ZoomElement, unknown>().on("zoom", zoomed);
+  const zoomended = function (this: ZoomElement) {
+    zooming = false;
+    setTimeout(() => {
+      if (!zooming)
+        d3.select(this).transition().call(zoom.transform, d3.zoomIdentity);
+    }, 5000);
+  };
+
+  return zoom.on("start", zoomstarted).on("zoom", zoomed).on("end", zoomended);
 };
 
 const centerFree = ({ degree }: Node) =>
