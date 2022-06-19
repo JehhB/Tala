@@ -2,11 +2,13 @@ import { FunctionComponent, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as d3 from "d3";
 import {
+  SubjectPosition,
   SimulationNodeDatum,
   SimulationLinkDatum,
   Simulation,
   DragBehavior,
-  SubjectPosition,
+  Selection,
+  ZoomBehavior,
 } from "d3";
 
 import { RGBA, cssColor } from "../../utils";
@@ -65,6 +67,19 @@ const drag = function <
     .on("end", dragended);
 };
 
+const zoomAndPan = function <
+  ZoomElement extends Element,
+  ChildElement extends Element
+>(
+  child: Selection<ChildElement, unknown, null, undefined>
+): ZoomBehavior<ZoomElement, unknown> {
+  const zoomed = function ({ transform }: any) {
+    child.attr("transform", transform);
+  };
+
+  return d3.zoom<ZoomElement, unknown>().on("zoom", zoomed);
+};
+
 const centerFree = ({ degree }: Node) =>
   degree && degree > 0 ? 0 : NODE_GRAVITY;
 
@@ -78,6 +93,8 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
     function () {
       if (!svgRef.current) return;
       const svg = d3.select(svgRef.current);
+      const graph = svg.append("g").attr("class", "graph");
+      svg.call(zoomAndPan(graph));
 
       const nodes = d3.map(
         props.nodes,
@@ -114,7 +131,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .force("forceY", d3.forceY<Node>().strength(centerFree))
         .on("tick", ticked);
 
-      const linkGroup = svg.append("g").attr("class", "links");
+      const linkGroup = graph.append("g").attr("class", "links");
       const link = linkGroup
         .selectAll("line")
         .data(links)
@@ -123,7 +140,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .attr("class", "link")
         .style("stroke", "#aaa");
 
-      const nodeGroup = svg.append("g").attr("class", "nodes");
+      const nodeGroup = graph.append("g").attr("class", "nodes");
       const node = nodeGroup
         .selectAll("circle")
         .data(nodes)
@@ -158,8 +175,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
       }
 
       return () => {
-        nodeGroup.remove();
-        linkGroup.remove();
+        graph.remove();
       };
     },
     [props.nodes.length, props.links.length]
