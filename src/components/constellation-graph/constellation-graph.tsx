@@ -21,6 +21,27 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
     );
   };
 
+  const degrees: { [index: string]: number } = {};
+  links
+    .map((link) =>
+      link.noteID > link.referenceID
+        ? { referenceID: link.noteID, noteID: link.referenceID }
+        : link
+    )
+    .filter(
+      (v, i, s) =>
+        s.findIndex(
+          ({ referenceID, noteID }) =>
+            v.referenceID === referenceID && v.noteID === noteID
+        ) === i
+    )
+    .forEach(({ referenceID, noteID }) => {
+      degrees[referenceID] = degrees[referenceID]
+        ? degrees[referenceID] + 1
+        : 1;
+      degrees[noteID] = degrees[noteID] ? degrees[noteID] + 1 : 1;
+    });
+
   return (
     <NetworkGraph
       nodes={notes
@@ -30,6 +51,7 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
           description: note.description,
           color: getCategoryColor(note.category_id),
           to: toValidTitle(note.title),
+          degree: degrees[note.id] ?? 0,
         }))
         .filter(
           (
@@ -40,6 +62,7 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
             description: string | undefined;
             color: RGBA;
             to: string;
+            degree: number;
           } => node.color !== null
         )}
       links={links.map((link) => ({

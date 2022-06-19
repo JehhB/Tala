@@ -23,12 +23,18 @@ export const generate_constellation = function (): Constellation {
       description: lorem.paragraphs(1),
     }));
 
+  const randomNoteRef = () =>
+    Math.min(
+      Math.floor(Math.random() * MOCK_NOTES_COUNT),
+      MOCK_NOTES_COUNT - 2
+    );
+
   const links: Link[] = Array(MOCK_LINKS_COUNT)
     .fill(null)
     .map((_) => ({
       id: random.alphaNumeric(64),
-      noteID: notes[Math.floor(Math.random() * MOCK_NOTES_COUNT)].id,
-      referenceID: notes[Math.floor(Math.random() * MOCK_NOTES_COUNT)].id,
+      noteID: notes[randomNoteRef()].id,
+      referenceID: notes[randomNoteRef()].id,
     }));
 
   return {

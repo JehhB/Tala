@@ -14,16 +14,17 @@ import { RGBA, cssColor } from "../../utils";
 import "./network-graph.css";
 
 const NODE_RADIUS = 8;
-const NODE_REPULSION = 90;
+const NODE_REPULSION = 190;
 const NODE_MARGIN = 1.5;
+const NODE_GRAVITY = 0.05;
 const LINK_LENGHT = 100;
-const NODE_GRAVITY = 0.005;
 
 export interface Node extends SimulationNodeDatum {
   id: string;
   label: string;
   to: string;
   color: RGBA;
+  degree?: number;
   description?: string;
 }
 
@@ -64,6 +65,9 @@ const drag = function <
     .on("end", dragended);
 };
 
+const centerFree = ({ degree }: Node) =>
+  degree && degree > 0 ? 0 : NODE_GRAVITY;
+
 export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
   props
 ) {
@@ -100,11 +104,14 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
             .id((_, i) => nodes[i].id)
             .distance(LINK_LENGHT)
         )
-        .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
+        .force(
+          "charge",
+          d3.forceManyBody<Node>().strength(({ degree }) => -NODE_REPULSION)
+        )
         .force("center", d3.forceCenter())
-        .force("forceX", d3.forceX().strength(NODE_GRAVITY))
-        .force("forceY", d3.forceY().strength(NODE_GRAVITY))
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
+        .force("forceX", d3.forceX<Node>().strength(centerFree))
+        .force("forceY", d3.forceY<Node>().strength(centerFree))
         .on("tick", ticked);
 
       const linkGroup = svg.append("g").attr("class", "links");
@@ -139,8 +146,6 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .text(({ label }) => label)
         .attr("text-anchor", "middle")
         .attr("y", 3 * NODE_RADIUS);
-
-      const title = node.append("title").text(({ label }) => label);
 
       function ticked() {
         link
