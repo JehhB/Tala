@@ -96,7 +96,7 @@ const zoomAndPan = function <
 };
 
 const centerFree = ({ degree }: Node) =>
-  degree && degree > 0 ? 0 : NODE_GRAVITY;
+  degree && degree > 0 ? NODE_GRAVITY / 4 : NODE_GRAVITY;
 
 export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
   props
