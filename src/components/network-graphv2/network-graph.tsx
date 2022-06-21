@@ -2,7 +2,7 @@ import { FunctionComponent, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Selection, SimulationNodeDatum, ZoomBehavior } from "d3";
 
-import { NetworkNode } from "../network-node";
+import { NetworkNode, NetworkLink } from "../index";
 import { RGBA, cssColor } from "../../utils";
 
 const NODE_RADIUS = 8;
@@ -143,9 +143,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
               const { x: x1, y: y1 } = sourceNode;
               const { x: x2, y: y2 } = targetNode;
 
-              return (
-                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#aaa" />
-              );
+              return <NetworkLink key={i} x1={x1} y1={y1} x2={x2} y2={y2} />;
             })}
         </g>
         <g className="graph__nodes" strokeWidth="1px">
