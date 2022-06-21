@@ -12,7 +12,6 @@ const NODE_MARGIN = 1.5;
 const LINK_LENGHT = 100;
 const NODE_GRAVITY = 0.05;
 const NODE_REPULSION = 190;
-const NODE_RADIUS_ACTIVE = 10;
 
 type Node = {
   id: string;
@@ -131,28 +130,30 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
               );
             })}
         </g>
-        <g className="graph__nodes" stroke="#000000" strokeWidth="1px">
+        <g className="graph__nodes" strokeWidth="1px">
           {nodes &&
             nodes.map(({ index, x, y }) => {
               const node = props.nodes[index];
               if (node === undefined) return null;
 
               return (
-                <g key={node.id} transform={`translate(${x},${y})`}>
-                  <NavLink to={node.to}>
-                    {({ isActive }) => (
-                      <>
-                        <circle
-                          r={isActive ? NODE_RADIUS_ACTIVE : NODE_RADIUS}
-                          fill={cssColor(node.color)}
-                        />
-                        <text textAnchor="middle" y={3 * NODE_RADIUS}>
-                          {node.label}
-                        </text>
-                      </>
-                    )}
+                <g transform={`translate(${x},${y})`}>
+                  <NavLink
+                    key={node.id}
+                    to={node.to}
+                    className={({ isActive }) =>
+                      "graph__node" + (isActive ? "--active" : "")
+                    }
+                  >
+                    <circle
+                      stroke="#000000"
+                      r={NODE_RADIUS}
+                      fill={cssColor(node.color)}
+                    />
+                    <text textAnchor="middle" y={3 * NODE_RADIUS}>
+                      {node.label}
+                    </text>
                   </NavLink>
-                  )
                 </g>
               );
             })}

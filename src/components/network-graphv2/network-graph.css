@@ -1,4 +1,14 @@
-.graph__nodes text {
+.graph__node text,
+.graph__node--active text {
   font-size: 0.625rem;
-  font-weight: lighter;
+}
+
+.graph__node circle {
+  transform: scale(1);
+  transition: transform var(--sm-exit-dur) ease;
+}
+
+.graph__node--active circle {
+  transform: scale(1.25);
+  transition-duration: var(--sm-enter-dur);
 }
