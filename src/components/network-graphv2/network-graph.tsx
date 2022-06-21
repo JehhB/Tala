@@ -1,11 +1,9 @@
 import { FunctionComponent, useEffect, useRef, useState } from "react";
-import { NavLink } from "react-router-dom";
 import * as d3 from "d3";
 import { Selection, SimulationNodeDatum, ZoomBehavior } from "d3";
 
+import { NetworkNode } from "../network-node";
 import { RGBA, cssColor } from "../../utils";
-
-import "./network-graph.css";
 
 const NODE_RADIUS = 8;
 const NODE_MARGIN = 1.5;
@@ -27,7 +25,7 @@ type Link = {
   target: number;
 };
 
-type NetworkGraphProp = {
+type NetworkGraphProps = {
   nodes: Node[];
   links: Link[];
 };
@@ -60,7 +58,7 @@ const zoomAndPan = function <
   return zoom.on("start", zoomstarted).on("zoom", zoomed).on("end", zoomended);
 };
 
-export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
+export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
   props
 ) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -157,23 +155,15 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
               if (node === undefined) return null;
 
               return (
-                <g key={node.id} transform={`translate(${x},${y})`}>
-                  <NavLink
-                    to={node.to}
-                    className={({ isActive }) =>
-                      "graph__node" + (isActive ? "--active" : "")
-                    }
-                  >
-                    <circle
-                      stroke="#000000"
-                      r={NODE_RADIUS}
-                      fill={cssColor(node.color)}
-                    />
-                    <text textAnchor="middle" y={3 * NODE_RADIUS}>
-                      {node.label}
-                    </text>
-                  </NavLink>
-                </g>
+                <NetworkNode
+                  key={node.id}
+                  index={index}
+                  label={node.label}
+                  to={node.to}
+                  color={cssColor(node.color)}
+                  x={x}
+                  y={y}
+                />
               );
             })}
         </g>

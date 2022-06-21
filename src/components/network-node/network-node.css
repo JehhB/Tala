@@ -1,22 +1,22 @@
-.graph__node text,
-.graph__node--active text {
+.network-node text,
+.network-node--active text {
   font-size: 0.625rem;
 }
 
-.graph__node text {
+.network-node text {
   fill: var(--gray-3);
 }
 
-.graph__node--active text {
+.network-node--active text {
   fill: #000000;
 }
 
-.graph__node circle {
+.network-node circle {
   transform: scale(1);
   transition: transform var(--sm-exit-dur) ease;
 }
 
-.graph__node--active circle {
+.network-node--active circle {
   transform: scale(1.25);
   transition-duration: var(--sm-enter-dur);
 }
