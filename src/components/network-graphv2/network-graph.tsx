@@ -1,7 +1,7 @@
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import * as d3 from "d3";
-import { SimulationNodeDatum } from "d3";
+import { Selection, SimulationNodeDatum, ZoomBehavior } from "d3";
 
 import { RGBA, cssColor } from "../../utils";
 
@@ -30,6 +30,34 @@ type Link = {
 type NetworkGraphProp = {
   nodes: Node[];
   links: Link[];
+};
+
+const zoomAndPan = function <
+  ZoomElement extends Element,
+  ChildElement extends Element
+>(
+  child: Selection<ChildElement, unknown, null, undefined>
+): ZoomBehavior<ZoomElement, unknown> {
+  const zoom = d3.zoom<ZoomElement, unknown>();
+  let zooming = false;
+
+  const zoomstarted = function () {
+    zooming = true;
+  };
+
+  const zoomed = function ({ transform }: any) {
+    child.attr("transform", transform);
+  };
+
+  const zoomended = function (this: ZoomElement) {
+    zooming = false;
+    setTimeout(() => {
+      if (!zooming)
+        d3.select(this).transition().call(zoom.transform, d3.zoomIdentity);
+    }, 5000);
+  };
+
+  return zoom.on("start", zoomstarted).on("zoom", zoomed).on("end", zoomended);
 };
 
 export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
@@ -99,6 +127,9 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
       };
 
       listener();
+
+      const svgSelection = d3.select(svgRef.current!);
+      svgSelection.call(zoomAndPan(svgSelection.select<SVGGElement>(".graph")));
 
       window.addEventListener("resize", listener);
       return () => window.removeEventListener("resize", listener);
