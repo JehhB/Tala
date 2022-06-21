@@ -21,6 +21,13 @@ export function cssColor({ r, g, b, a }: RGBA) {
   return `rgba(${r},${g},${b},${a ?? 1.0})`;
 }
 
+export function colorID({ r, g, b, a }: RGBA) {
+  const c = [r, g, b, a]
+    .map((n) => BigInt(n & 255))
+    .reduce((p, c) => (p << 8n) | c);
+  return "c" + c.toString(16).padStart(8, "0").toUpperCase();
+}
+
 export function gradient(colors: RGBA[], percent: number): RGBA | null {
   if (colors.length == 0 || percent < 0.0 || percent > 1.0) return null;
   if (colors.length == 1) return colors[0];

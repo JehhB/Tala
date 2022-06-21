@@ -1,9 +1,15 @@
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import {
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import * as d3 from "d3";
 import { Selection, SimulationNodeDatum, ZoomBehavior } from "d3";
 
 import { NetworkNode, NetworkLink } from "../index";
-import { RGBA, cssColor } from "../../utils";
+import { RGBA, cssColor, colorID } from "../../utils";
 
 const NODE_RADIUS = 8;
 const NODE_MARGIN = 1.5;
@@ -65,6 +71,10 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
   const [nodes, setNodes] = useState<
     { index: number; x: number; y: number }[] | null
   >(null);
+
+  const colors = props.nodes
+    .map(({ color }) => color)
+    .filter((v, i, s) => s.findIndex((c) => colorID(c) == colorID(v)) === i);
 
   useEffect(
     function () {
@@ -131,6 +141,21 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
       ref={svgRef}
       xmlns="http://www.w3.org/2000/svg"
     >
+      <defs>
+        {Array<ReactNode>().concat(
+          ...colors.map((source) =>
+            colors.map((target) => {
+              const id = colorID(source) + colorID(target);
+              return (
+                <linearGradient key={id} id={id}>
+                  <stop offset="0%" stopColor={cssColor(source)} />
+                  <stop offset="100%" stopColor={cssColor(target)} />
+                </linearGradient>
+              );
+            })
+          )
+        )}
+      </defs>
       <g className="graph">
         <g className="graph__links">
           {nodes &&
@@ -142,8 +167,10 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
 
               const { x: x1, y: y1 } = sourceNode;
               const { x: x2, y: y2 } = targetNode;
+              const c1 = props.nodes[source].color;
+              const c2 = props.nodes[target].color;
 
-              return <NetworkLink key={i} x1={x1} y1={y1} x2={x2} y2={y2} />;
+              return <NetworkLink key={i} {...{ x1, x2, y1, y2, c1, c2 }} />;
             })}
         </g>
         <g className="graph__nodes" strokeWidth="1px">
@@ -152,15 +179,13 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
               const node = props.nodes[index];
               if (node === undefined) return null;
 
+              const { label, to } = node;
+              const color = cssColor(node.color);
+
               return (
                 <NetworkNode
                   key={node.id}
-                  index={index}
-                  label={node.label}
-                  to={node.to}
-                  color={cssColor(node.color)}
-                  x={x}
-                  y={y}
+                  {...{ index, label, to, x, y, color }}
                 />
               );
             })}
