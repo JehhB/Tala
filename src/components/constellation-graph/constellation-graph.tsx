@@ -42,32 +42,38 @@ export const ConstellationGraph: FunctionComponent<{}> = function () {
       degrees[noteID] = degrees[noteID] ? degrees[noteID] + 1 : 1;
     });
 
+  const nodes = notes
+    .map((note) => ({
+      id: note.id,
+      label: note.title,
+      description: note.description,
+      color: getCategoryColor(note.category_id),
+      to: toValidTitle(note.title),
+      degree: degrees[note.id] ?? 0,
+    }))
+    .filter(
+      (
+        node
+      ): node is {
+        id: string;
+        label: string;
+        description: string | undefined;
+        color: RGBA;
+        to: string;
+        degree: number;
+      } => node.color !== null
+    );
+  const nodeIndex = new Map<string, number>();
+  nodes.forEach((node, i) => {
+    nodeIndex.set(node.id, i);
+  });
+
   return (
     <NetworkGraph
-      nodes={notes
-        .map((note) => ({
-          id: note.id,
-          label: note.title,
-          description: note.description,
-          color: getCategoryColor(note.category_id),
-          to: toValidTitle(note.title),
-          degree: degrees[note.id] ?? 0,
-        }))
-        .filter(
-          (
-            node
-          ): node is {
-            id: string;
-            label: string;
-            description: string | undefined;
-            color: RGBA;
-            to: string;
-            degree: number;
-          } => node.color !== null
-        )}
+      nodes={nodes}
       links={links.map((link) => ({
-        source: link.noteID,
-        target: link.referenceID,
+        source: nodeIndex.get(link.noteID) ?? -1,
+        target: nodeIndex.get(link.referenceID) ?? -1,
       }))}
     />
   );

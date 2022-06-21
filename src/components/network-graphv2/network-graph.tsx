@@ -23,8 +23,8 @@ type Node = {
 };
 
 type Link = {
-  source: string;
-  target: string;
+  source: number;
+  target: number;
 };
 
 type NetworkGraphProp = {
@@ -68,11 +68,6 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
     { index: number; x: number; y: number }[] | null
   >(null);
 
-  const nodesIndex = new Map<string, number>();
-  props.nodes.forEach(({ id }, i) => {
-    nodesIndex.set(id, i);
-  });
-
   useEffect(
     function () {
       const simulationNodes = Array(props.nodes.length)
@@ -84,13 +79,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         .force("center", d3.forceCenter())
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
         .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
-        .force(
-          "link",
-          d3
-            .forceLink(simulationLinkDatum)
-            .distance(LINK_LENGHT)
-            .id(({ index }) => props.nodes[index ?? -1]?.id ?? "")
-        )
+        .force("link", d3.forceLink(simulationLinkDatum).distance(LINK_LENGHT))
         .force("forceX", d3.forceX().strength(NODE_GRAVITY))
         .force("forceY", d3.forceY().strength(NODE_GRAVITY))
         .on("tick", ticked);
@@ -148,8 +137,8 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
         <g className="graph__links">
           {nodes &&
             props.links.map(({ source, target }, i) => {
-              const sourceNode = nodes[nodesIndex.get(source) ?? -1];
-              const targetNode = nodes[nodesIndex.get(target) ?? -1];
+              const sourceNode = nodes[source];
+              const targetNode = nodes[target];
               if (sourceNode === undefined || targetNode === undefined)
                 return null;
 
@@ -168,9 +157,8 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
               if (node === undefined) return null;
 
               return (
-                <g transform={`translate(${x},${y})`}>
+                <g key={node.id} transform={`translate(${x},${y})`}>
                   <NavLink
-                    key={node.id}
                     to={node.to}
                     className={({ isActive }) =>
                       "graph__node" + (isActive ? "--active" : "")
