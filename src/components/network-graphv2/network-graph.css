@@ -3,6 +3,14 @@
   font-size: 0.625rem;
 }
 
+.graph__node text {
+  fill: var(--gray-3);
+}
+
+.graph__node--active text {
+  fill: #000000;
+}
+
 .graph__node circle {
   transform: scale(1);
   transition: transform var(--sm-exit-dur) ease;
