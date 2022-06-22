@@ -63,7 +63,7 @@ export const NetworkNode: FunctionComponent<NetworkNodeProps> = function ({
         nodeEl.on("mousedown.drag", null);
       };
     },
-    [nodeRef, node, simulation]
+    [node, simulation]
   );
 
   return (

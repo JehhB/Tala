@@ -4,6 +4,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useCallback,
 } from "react";
 import * as d3 from "d3";
 import { Selection, Simulation, SimulationNodeDatum, ZoomBehavior } from "d3";
@@ -44,25 +45,17 @@ const zoomAndPan = function <
   child: Selection<ChildElement, unknown, null, undefined>
 ): ZoomBehavior<ZoomElement, unknown> {
   const zoom = d3.zoom<ZoomElement, unknown>();
-  let zooming = false;
+  let timer: number;
 
-  const zoomstarted = function () {
-    zooming = true;
-  };
-
-  const zoomed = function ({ transform }: any) {
+  const zoomed = function (this: ZoomElement, { transform }: any) {
     child.attr("transform", transform);
-  };
-
-  const zoomended = function (this: ZoomElement) {
-    zooming = false;
-    setTimeout(() => {
-      if (!zooming)
-        d3.select(this).transition().call(zoom.transform, d3.zoomIdentity);
+    clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      d3.select(this).transition().call(zoom.transform, d3.zoomIdentity);
     }, 5000);
   };
 
-  return zoom.on("start", zoomstarted).on("zoom", zoomed).on("end", zoomended);
+  return zoom.on("zoom", zoomed);
 };
 
 export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
@@ -116,35 +109,32 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
     [nodes.length, links.length]
   );
 
-  useEffect(
-    function () {
-      if (!svgRef.current) return;
+  const handleGraph = useCallback(function (graph: SVGGElement) {
+    if (!svgRef.current) return;
 
-      const svg = svgRef.current;
-      const listener = () => {
-        svg.removeAttribute("viewBox");
+    const svg = svgRef.current;
+    const listener = () => {
+      svg.removeAttribute("viewBox");
 
-        const width = svg.clientWidth;
-        const height = svg.clientHeight;
-        svg.setAttribute(
-          "viewBox",
-          `${-width / 2} ${-height / 2} ${width} ${height}`
-        );
-      };
+      const width = svg.clientWidth;
+      const height = svg.clientHeight;
+      svg.setAttribute(
+        "viewBox",
+        `${-width / 2} ${-height / 2} ${width} ${height}`
+      );
+    };
 
-      listener();
+    listener();
 
-      const svgSelection = d3.select(svgRef.current!);
-      svgSelection.call(zoomAndPan(svgSelection.select<SVGGElement>(".graph")));
+    const svgSelection = d3.select(svgRef.current!);
+    svgSelection.call(zoomAndPan(d3.select(graph)));
 
-      window.addEventListener("resize", listener);
-      return () => {
-        window.removeEventListener("resize", listener);
-        svgSelection.on("mousedown.zoom", null);
-      };
-    },
-    [svgRef]
-  );
+    window.addEventListener("resize", listener);
+    return () => {
+      window.removeEventListener("resize", listener);
+      svgSelection.on("mousedown.zoom", null);
+    };
+  }, []);
 
   return (
     <svg
@@ -170,7 +160,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
       </defs>
       {simulation && (
         <SimulationContext.Provider value={simulation}>
-          <g className="graph">
+          <g ref={handleGraph} className="graph">
             <g className="graph__links">
               {links.map(({ source, target }, i) => {
                 const c1 = nodes[source].color;
