@@ -6,10 +6,11 @@ import {
   useState,
 } from "react";
 import * as d3 from "d3";
-import { Selection, SimulationNodeDatum, ZoomBehavior } from "d3";
+import { Selection, Simulation, SimulationNodeDatum, ZoomBehavior } from "d3";
 
 import { NetworkNode, NetworkLink } from "../index";
 import { RGBA, cssColor, colorID } from "../../utils";
+import { SimulationContext } from "../../contexts";
 
 const NODE_RADIUS = 8;
 const NODE_MARGIN = 1.5;
@@ -64,47 +65,46 @@ const zoomAndPan = function <
   return zoom.on("start", zoomstarted).on("zoom", zoomed).on("end", zoomended);
 };
 
-export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
-  props
-) {
+export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
+  nodes,
+  links,
+}) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [nodes, setNodes] = useState<
-    { index: number; x: number; y: number }[] | null
-  >(null);
+  const [watcher, advance] = useState(0);
+  const [simulation, setSimulation] = useState<Simulation<
+    SimulationNodeDatum,
+    undefined
+  > | null>(null);
 
-  const colors = props.nodes
+  const colors = nodes
     .map(({ color }) => color)
     .filter((v, i, s) => s.findIndex((c) => colorID(c) == colorID(v)) === i);
 
   useEffect(
     function () {
-      const simulationNodes = Array(props.nodes.length)
+      const simulationNodes = Array(nodes.length)
         .fill(0)
         .map((_) => ({} as SimulationNodeDatum));
-      const simulationLinkDatum = props.links.map((link) => ({ ...link }));
+      const simulationLinkDatum = links.map((link) => ({ ...link }));
 
-      d3.forceSimulation(simulationNodes)
+      const simulation = d3
+        .forceSimulation(simulationNodes)
         .force("center", d3.forceCenter())
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
         .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
         .force("link", d3.forceLink(simulationLinkDatum).distance(LINK_LENGHT))
         .force("forceX", d3.forceX().strength(NODE_GRAVITY))
         .force("forceY", d3.forceY().strength(NODE_GRAVITY))
-        .on("tick", ticked);
+        .on("tick", function () {
+          advance((a) => a + 1);
+        });
+      setSimulation(simulation);
 
-      function ticked() {
-        const state = Array<{ index: number; x: number; y: number }>();
-        simulationNodes.forEach(({ index, x, y }) =>
-          state.push({
-            index: index ?? -1,
-            x: x ?? 0,
-            y: y ?? 0,
-          })
-        );
-        setNodes(state);
-      }
+      return () => {
+        setSimulation(null);
+      };
     },
-    [props.nodes.length, props.links.length]
+    [nodes.length, links.length]
   );
 
   useEffect(
@@ -156,41 +156,33 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function (
           )
         )}
       </defs>
-      <g className="graph">
-        <g className="graph__links">
-          {nodes &&
-            props.links.map(({ source, target }, i) => {
-              const sourceNode = nodes[source];
-              const targetNode = nodes[target];
-              if (sourceNode === undefined || targetNode === undefined)
-                return null;
-
-              const { x: x1, y: y1 } = sourceNode;
-              const { x: x2, y: y2 } = targetNode;
-              const c1 = props.nodes[source].color;
-              const c2 = props.nodes[target].color;
-
-              return <NetworkLink key={i} {...{ x1, x2, y1, y2, c1, c2 }} />;
-            })}
-        </g>
-        <g className="graph__nodes" strokeWidth="1px">
-          {nodes &&
-            nodes.map(({ index, x, y }) => {
-              const node = props.nodes[index];
-              if (node === undefined) return null;
-
-              const { label, to } = node;
-              const color = cssColor(node.color);
-
-              return (
+      {simulation && (
+        <SimulationContext.Provider value={simulation}>
+          <g className="graph">
+            <g className="graph__links">
+              {links.map(({ source, target }, i) => {
+                const c1 = nodes[source].color;
+                const c2 = nodes[target].color;
+                return (
+                  <NetworkLink
+                    key={i}
+                    {...{ source, target, c1, c2, watcher }}
+                  />
+                );
+              })}
+            </g>
+            <g className="graph__nodes" strokeWidth="1px">
+              {nodes.map(({ label, to, color, id }, index) => (
                 <NetworkNode
-                  key={node.id}
-                  {...{ index, label, to, x, y, color }}
+                  key={id}
+                  color={cssColor(color)}
+                  {...{ label, to, index, watcher }}
                 />
-              );
-            })}
-        </g>
-      </g>
+              ))}
+            </g>
+          </g>
+        </SimulationContext.Provider>
+      )}
     </svg>
   );
 };

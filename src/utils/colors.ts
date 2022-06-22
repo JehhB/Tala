@@ -24,7 +24,7 @@ export function cssColor({ r, g, b, a }: RGBA) {
 export function colorID({ r, g, b, a }: RGBA) {
   const c = [r, g, b, a]
     .map((n) => BigInt(n & 255))
-    .reduce((p, c) => (p << 8n) | c);
+    .reduce((p, c) => (p << BigInt(8)) | c);
   return "c" + c.toString(16).padStart(8, "0").toUpperCase();
 }
 
