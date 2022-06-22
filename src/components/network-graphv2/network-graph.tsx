@@ -87,14 +87,23 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
         .map((_) => ({} as SimulationNodeDatum));
       const simulationLinkDatum = links.map((link) => ({ ...link }));
 
+      const gravity = (i: number) =>
+        (nodes[i]?.degree ?? 0) > 0 ? NODE_GRAVITY / 4 : NODE_GRAVITY;
+
       const simulation = d3
         .forceSimulation(simulationNodes)
         .force("center", d3.forceCenter())
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
         .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
         .force("link", d3.forceLink(simulationLinkDatum).distance(LINK_LENGHT))
-        .force("forceX", d3.forceX().strength(NODE_GRAVITY))
-        .force("forceY", d3.forceY().strength(NODE_GRAVITY))
+        .force(
+          "forceX",
+          d3.forceX().strength(({ index }) => gravity(index ?? -1))
+        )
+        .force(
+          "forceY",
+          d3.forceY().strength(({ index }) => gravity(index ?? -1))
+        )
         .on("tick", function () {
           advance((a) => a + 1);
         });
