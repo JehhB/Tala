@@ -138,7 +138,10 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
       svgSelection.call(zoomAndPan(svgSelection.select<SVGGElement>(".graph")));
 
       window.addEventListener("resize", listener);
-      return () => window.removeEventListener("resize", listener);
+      return () => {
+        window.removeEventListener("resize", listener);
+        svgSelection.on("mousedown.zoom", null);
+      };
     },
     [svgRef]
   );
