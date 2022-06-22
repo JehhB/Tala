@@ -1,70 +1,40 @@
-import { FunctionComponent, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import * as d3 from "d3";
 import {
-  SubjectPosition,
-  SimulationNodeDatum,
-  SimulationLinkDatum,
-  Simulation,
-  DragBehavior,
-  Selection,
-  ZoomBehavior,
-} from "d3";
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import * as d3 from "d3";
+import { Selection, Simulation, SimulationNodeDatum, ZoomBehavior } from "d3";
 
-import { RGBA, cssColor } from "../../utils";
-
-import "./network-graph.css";
+import { NetworkNode, NetworkLink } from "../index";
+import { RGBA, cssColor, colorID } from "../../utils";
+import { SimulationContext } from "../../contexts";
 
 const NODE_RADIUS = 8;
-const NODE_REPULSION = 190;
 const NODE_MARGIN = 1.5;
-const NODE_GRAVITY = 0.05;
 const LINK_LENGHT = 100;
+const NODE_GRAVITY = 0.05;
+const NODE_REPULSION = 190;
 
-export interface Node extends SimulationNodeDatum {
+type Node = {
   id: string;
   label: string;
   to: string;
   color: RGBA;
   degree?: number;
   description?: string;
-}
-
-export type Link = SimulationLinkDatum<Node>;
-
-type NetworkGraphProp = {
-  nodes: Node[];
-  links: Link[];
 };
 
-const drag = function <
-  NodeElement extends Element,
-  NodeDatum extends SimulationNodeDatum
->(
-  simulation: Simulation<NodeDatum, undefined>
-): DragBehavior<NodeElement, NodeDatum, NodeDatum | SubjectPosition> {
-  const dragstarted = (event: any, d: NodeDatum) => {
-    if (!event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-  };
+type Link = {
+  source: number;
+  target: number;
+};
 
-  const dragged = (event: any, d: NodeDatum) => {
-    d.fx = event.x;
-    d.fy = event.y;
-  };
-
-  const dragended = (event: any, d: NodeDatum) => {
-    if (!event.active) simulation.alphaTarget(0.0001);
-    d.fx = null;
-    d.fy = null;
-  };
-
-  return d3
-    .drag<NodeElement, NodeDatum>()
-    .on("start", dragstarted)
-    .on("drag", dragged)
-    .on("end", dragended);
+type NetworkGraphProps = {
+  nodes: Node[];
+  links: Link[];
 };
 
 const zoomAndPan = function <
@@ -95,105 +65,55 @@ const zoomAndPan = function <
   return zoom.on("start", zoomstarted).on("zoom", zoomed).on("end", zoomended);
 };
 
-const centerFree = ({ degree }: Node) =>
-  degree && degree > 0 ? NODE_GRAVITY / 4 : NODE_GRAVITY;
-
-export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
-  props
-) {
-  const navigate = useNavigate();
+export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
+  nodes,
+  links,
+}) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [watcher, advance] = useState(0);
+  const [simulation, setSimulation] = useState<Simulation<
+    SimulationNodeDatum,
+    undefined
+  > | null>(null);
+
+  const colors = nodes
+    .map(({ color }) => color)
+    .filter((v, i, s) => s.findIndex((c) => colorID(c) == colorID(v)) === i);
 
   useEffect(
     function () {
-      if (!svgRef.current) return;
-      const svg = d3.select(svgRef.current);
-      const graph = svg.append("g").attr("class", "graph");
-      svg.call(zoomAndPan(graph));
+      const simulationNodes = Array(nodes.length)
+        .fill(0)
+        .map((_) => ({} as SimulationNodeDatum));
+      const simulationLinkDatum = links.map((link) => ({ ...link }));
 
-      const nodes = d3.map(
-        props.nodes,
-        (node): Node => ({
-          ...node,
-        })
-      );
-      const links = d3
-        .map(props.links, (link) => ({
-          source: nodes.find((node) => node.id === link.source),
-          target: nodes.find((node) => node.id === link.target),
-        }))
-        .filter(
-          (link): link is { source: Node; target: Node } =>
-            link.source !== undefined && link.target !== undefined
-        );
+      const gravity = (i: number) =>
+        (nodes[i]?.degree ?? 0) > 0 ? NODE_GRAVITY / 4 : NODE_GRAVITY;
 
       const simulation = d3
-        .forceSimulation(nodes)
-        .force(
-          "link",
-          d3
-            .forceLink(links)
-            .id((_, i) => nodes[i].id)
-            .distance(LINK_LENGHT)
-        )
-        .force(
-          "charge",
-          d3.forceManyBody<Node>().strength(({ degree }) => -NODE_REPULSION)
-        )
+        .forceSimulation(simulationNodes)
         .force("center", d3.forceCenter())
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
-        .force("forceX", d3.forceX<Node>().strength(centerFree))
-        .force("forceY", d3.forceY<Node>().strength(centerFree))
-        .on("tick", ticked);
-
-      const linkGroup = graph.append("g").attr("class", "links");
-      const link = linkGroup
-        .selectAll("line")
-        .data(links)
-        .enter()
-        .append("line")
-        .attr("class", "link")
-        .style("stroke", "#aaa");
-
-      const nodeGroup = graph.append("g").attr("class", "nodes");
-      const node = nodeGroup
-        .selectAll("circle")
-        .data(nodes)
-        .enter()
-        .append("g")
-        .attr("class", "node")
-        .call(drag(simulation));
-
-      const circle = node
-        .append("circle")
-        .on("click", (_, d) => {
-          navigate(d.to);
-        })
-        .attr("fill", (node) => cssColor(node.color))
-        .attr("r", NODE_RADIUS)
-        .attr("stroke", "#000000");
-
-      const label = node
-        .append("text")
-        .text(({ label }) => label)
-        .attr("text-anchor", "middle")
-        .attr("y", 3 * NODE_RADIUS);
-
-      function ticked() {
-        link
-          .attr("x1", (d) => d.source.x!)
-          .attr("y1", (d) => d.source.y!)
-          .attr("x2", (d) => d.target.x!)
-          .attr("y2", (d) => d.target.y!);
-
-        node.attr("transform", ({ x, y }) => `translate(${x},${y})`);
-      }
+        .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
+        .force("link", d3.forceLink(simulationLinkDatum).distance(LINK_LENGHT))
+        .force(
+          "forceX",
+          d3.forceX().strength(({ index }) => gravity(index ?? -1))
+        )
+        .force(
+          "forceY",
+          d3.forceY().strength(({ index }) => gravity(index ?? -1))
+        )
+        .on("tick", function () {
+          advance((a) => a + 1);
+        });
+      setSimulation(simulation);
 
       return () => {
-        graph.remove();
+        setSimulation(null);
       };
     },
-    [props.nodes.length, props.links.length]
+    [nodes.length, links.length]
   );
 
   useEffect(
@@ -214,6 +134,9 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
 
       listener();
 
+      const svgSelection = d3.select(svgRef.current!);
+      svgSelection.call(zoomAndPan(svgSelection.select<SVGGElement>(".graph")));
+
       window.addEventListener("resize", listener);
       return () => window.removeEventListener("resize", listener);
     },
@@ -226,6 +149,49 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProp> = function (
       height="100%"
       ref={svgRef}
       xmlns="http://www.w3.org/2000/svg"
-    ></svg>
+    >
+      <defs>
+        {Array<ReactNode>().concat(
+          ...colors.map((source) =>
+            colors.map((target) => {
+              const id = colorID(source) + colorID(target);
+              return (
+                <linearGradient key={id} id={id}>
+                  <stop offset="0%" stopColor={cssColor(source)} />
+                  <stop offset="100%" stopColor={cssColor(target)} />
+                </linearGradient>
+              );
+            })
+          )
+        )}
+      </defs>
+      {simulation && (
+        <SimulationContext.Provider value={simulation}>
+          <g className="graph">
+            <g className="graph__links">
+              {links.map(({ source, target }, i) => {
+                const c1 = nodes[source].color;
+                const c2 = nodes[target].color;
+                return (
+                  <NetworkLink
+                    key={i}
+                    {...{ source, target, c1, c2, watcher }}
+                  />
+                );
+              })}
+            </g>
+            <g className="graph__nodes" strokeWidth="1px">
+              {nodes.map(({ label, to, color, id }, index) => (
+                <NetworkNode
+                  key={id}
+                  color={cssColor(color)}
+                  {...{ label, to, index, watcher }}
+                />
+              ))}
+            </g>
+          </g>
+        </SimulationContext.Provider>
+      )}
+    </svg>
   );
 };

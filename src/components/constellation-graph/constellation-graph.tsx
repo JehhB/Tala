@@ -1,6 +1,6 @@
 import { FunctionComponent, useContext } from "react";
 
-import { NetworkGraph } from "../network-graphv2";
+import { NetworkGraph } from "../network-graph";
 import { ConstellationContext } from "../../contexts";
 import { RGBA, colorPalletGradient, rgb, toValidTitle } from "../../utils";
 
