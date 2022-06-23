@@ -44,7 +44,9 @@ const zoomAndPan = function <
 >(
   child: Selection<ChildElement, unknown, null, undefined>
 ): ZoomBehavior<ZoomElement, unknown> {
-  const zoom = d3.zoom<ZoomElement, unknown>();
+  const zoom = d3
+    .zoom<ZoomElement, unknown>()
+    .scaleExtent([1, Number.POSITIVE_INFINITY]);
   let timer: number;
 
   const zoomed = function (this: ZoomElement, { transform }: any) {
