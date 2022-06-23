@@ -88,6 +88,7 @@
 .content {
   position: relative;
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   width: 100%;
   overflow-y: auto;
@@ -102,12 +103,14 @@
 @media screen and (min-width: 905px) {
   .content {
     padding: 1rem 1.5rem;
+    flex-direction: row-reverse;
   }
 }
 
 .content__graph {
-  position: absolute;
-  inset: 0;
+  flex: 1 0 100%;
+  position: relative;
+  top: 0;
 }
 
 .content__note:empty {
@@ -119,7 +122,8 @@
 }
 
 @media screen and (min-width: 905px) {
-  .content::after {
+  .content__graph {
+    position: sticky;
     content: "";
     flex: 1 1 50%;
   }
