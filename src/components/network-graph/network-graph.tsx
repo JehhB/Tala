@@ -68,6 +68,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
     SimulationNodeDatum,
     undefined
   > | null>(null);
+  const [test] = useState<boolean>(true);
 
   const colors = nodes
     .map(({ color }) => color)
@@ -85,6 +86,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
 
       const simulation = d3
         .forceSimulation(simulationNodes)
+        .alphaDecay(0.01)
         .force("center", d3.forceCenter())
         .force("colide", d3.forceCollide(NODE_RADIUS * NODE_MARGIN))
         .force("charge", d3.forceManyBody().strength(-NODE_REPULSION))
@@ -109,10 +111,8 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
     [nodes.length, links.length]
   );
 
-  const handleGraph = useCallback(function (graph: SVGGElement) {
-    if (!svgRef.current) return;
-
-    const svg = svgRef.current;
+  useEffect(function () {
+    const svg = svgRef.current!;
     const listener = () => {
       svg.removeAttribute("viewBox");
 
@@ -125,15 +125,15 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
     };
 
     listener();
-
-    const svgSelection = d3.select(svgRef.current!);
-    svgSelection.call(zoomAndPan(d3.select(graph)));
-
     window.addEventListener("resize", listener);
     return () => {
       window.removeEventListener("resize", listener);
-      svgSelection.on("mousedown.zoom", null);
     };
+  }, []);
+
+  const handleGraph = useCallback(function (graph: SVGGElement) {
+    const svgSelection = d3.select(svgRef.current!);
+    svgSelection.call(zoomAndPan(d3.select(graph)));
   }, []);
 
   return (
@@ -158,7 +158,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
           )
         )}
       </defs>
-      {simulation && (
+      {test && simulation && (
         <SimulationContext.Provider value={simulation}>
           <g ref={handleGraph} className="graph">
             <g className="graph__links">
