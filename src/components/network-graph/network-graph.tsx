@@ -68,7 +68,6 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
     SimulationNodeDatum,
     undefined
   > | null>(null);
-  const [test] = useState<boolean>(true);
 
   const colors = nodes
     .map(({ color }) => color)
@@ -158,7 +157,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
           )
         )}
       </defs>
-      {test && simulation && (
+      {simulation && (
         <SimulationContext.Provider value={simulation}>
           <g ref={handleGraph} className="graph">
             <g className="graph__links">
