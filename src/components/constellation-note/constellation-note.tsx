@@ -4,6 +4,8 @@ import { Helmet } from "react-helmet";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHightlight from "rehype-highlight";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeSlug from "rehype-slug";
 import useFetch from "react-fetch-hook";
 
 import { NoteContainer } from "../note-container";
@@ -52,7 +54,7 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeHightlight]}
+            rehypePlugins={[rehypeSlug, rehypeSanitize, rehypeHightlight]}
           >
             {note.data.content}
           </ReactMarkdown>
