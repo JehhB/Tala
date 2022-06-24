@@ -4,7 +4,6 @@ import {
   useEffect,
   useRef,
   useState,
-  useCallback,
 } from "react";
 import * as d3 from "d3";
 import { Selection, Simulation, SimulationNodeDatum, ZoomBehavior } from "d3";
@@ -132,10 +131,19 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
     };
   }, []);
 
-  const handleGraph = useCallback(function (graph: SVGGElement) {
-    const svgSelection = d3.select(svgRef.current!);
-    svgSelection.call(zoomAndPan(d3.select(graph)));
-  }, []);
+  useEffect(
+    function () {
+      if (!simulation) return;
+
+      const svgSelection = d3.select(svgRef.current!);
+      svgSelection.call(zoomAndPan(svgSelection.select<SVGGElement>(".graph")));
+
+      return () => {
+        svgSelection.on("mousedown.zoom", null);
+      };
+    },
+    [simulation]
+  );
 
   return (
     <svg
@@ -161,7 +169,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
       </defs>
       {simulation && (
         <SimulationContext.Provider value={simulation}>
-          <g ref={handleGraph} className="graph">
+          <g className="graph">
             <g className="graph__links">
               {links.map(({ source, target }, i) => {
                 const c1 = nodes[source].color;
