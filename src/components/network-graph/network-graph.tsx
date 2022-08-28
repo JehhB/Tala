@@ -12,6 +12,8 @@ import { NetworkNode, NetworkLink } from "../index";
 import { RGBA, cssColor, colorID } from "../../utils";
 import { SimulationContext } from "../../contexts";
 
+import "./network-graph.css";
+
 const NODE_RADIUS = 8;
 const NODE_MARGIN = 1.5;
 const LINK_LENGHT = 100;
@@ -63,6 +65,7 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
   nodes,
   links,
 }) {
+  const divRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [watcher, advance] = useState(0);
   const [simulation, setSimulation] = useState<Simulation<
@@ -112,22 +115,19 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
   );
 
   useEffect(function () {
-    const svg = svgRef.current!;
-    const listener = () => {
-      svg.removeAttribute("viewBox");
+    const observer = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        const { width, height } = entry.contentRect;
+        svgRef.current!.setAttribute(
+          "viewBox",
+          `${-width / 2} ${-height / 2} ${width - 10} ${height - 10}`
+        );
+      });
+    });
 
-      const width = svg.clientWidth;
-      const height = svg.clientHeight;
-      svg.setAttribute(
-        "viewBox",
-        `${-width / 2} ${-height / 2} ${width} ${height}`
-      );
-    };
-
-    listener();
-    window.addEventListener("resize", listener);
+    observer.observe(divRef.current!);
     return () => {
-      window.removeEventListener("resize", listener);
+      observer.disconnect();
     };
   }, []);
 
@@ -146,54 +146,55 @@ export const NetworkGraph: FunctionComponent<NetworkGraphProps> = function ({
   );
 
   return (
-    <svg
-      width="100%"
-      height="100%"
-      ref={svgRef}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <defs>
-        {Array<ReactNode>().concat(
-          ...colors.map((source) =>
-            colors.map((target) => {
-              const id = colorID(source) + colorID(target);
-              return (
-                <linearGradient key={id} id={id}>
-                  <stop offset="0%" stopColor={cssColor(source)} />
-                  <stop offset="100%" stopColor={cssColor(target)} />
-                </linearGradient>
-              );
-            })
-          )
-        )}
-      </defs>
-      {simulation && (
-        <SimulationContext.Provider value={simulation}>
-          <g className="graph">
-            <g className="graph__links">
-              {links.map(({ source, target }, i) => {
-                const c1 = nodes[source].color;
-                const c2 = nodes[target].color;
+    <div className="network-graph" ref={divRef}>
+      <svg
+        className="network-graph__svg"
+        ref={svgRef}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          {Array<ReactNode>().concat(
+            ...colors.map((source) =>
+              colors.map((target) => {
+                const id = colorID(source) + colorID(target);
                 return (
-                  <NetworkLink
-                    key={i}
-                    {...{ source, target, c1, c2, watcher }}
-                  />
+                  <linearGradient key={id} id={id}>
+                    <stop offset="0%" stopColor={cssColor(source)} />
+                    <stop offset="100%" stopColor={cssColor(target)} />
+                  </linearGradient>
                 );
-              })}
+              })
+            )
+          )}
+        </defs>
+        {simulation && (
+          <SimulationContext.Provider value={simulation}>
+            <g className="graph">
+              <g className="graph__links">
+                {links.map(({ source, target }, i) => {
+                  const c1 = nodes[source].color;
+                  const c2 = nodes[target].color;
+                  return (
+                    <NetworkLink
+                      key={i}
+                      {...{ source, target, c1, c2, watcher }}
+                    />
+                  );
+                })}
+              </g>
+              <g className="graph__nodes" strokeWidth="1px">
+                {nodes.map(({ label, to, color, id }, index) => (
+                  <NetworkNode
+                    key={id}
+                    color={cssColor(color)}
+                    {...{ label, to, index, watcher }}
+                  />
+                ))}
+              </g>
             </g>
-            <g className="graph__nodes" strokeWidth="1px">
-              {nodes.map(({ label, to, color, id }, index) => (
-                <NetworkNode
-                  key={id}
-                  color={cssColor(color)}
-                  {...{ label, to, index, watcher }}
-                />
-              ))}
-            </g>
-          </g>
-        </SimulationContext.Provider>
-      )}
-    </svg>
+          </SimulationContext.Provider>
+        )}
+      </svg>
+    </div>
   );
 };

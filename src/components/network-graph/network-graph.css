@@ -1,0 +1,9 @@
+.network-graph,
+.network-graph__svg {
+  width: 100%;
+  height: 100%;
+}
+
+.network-graph__svg {
+  overflow: visible;
+}
