@@ -14,13 +14,31 @@
   align-items: center;
   height: 2.5rem;
   padding: 0 1rem;
-  border-top: 4px solid;
+  border-top: 8px solid;
+  border-radius: 4px 4px 0 0;
   border-bottom: 1px solid var(--gray-1);
+}
+
+.note__header::after {
+  content: "";
+  height: 4px;
+  width: 2rem;
+  border-radius: 2px;
+  background-color: #ffffff;
+  position: absolute;
+  inset: -6px 0 0 0;
+  margin: 0 auto;
 }
 
 @media screen and (min-width: 600px) {
   .note__header {
+    border-top-width: 4px;
+    border-radius: 0;
     top: -1rem;
+  }
+
+  .note__header::after {
+    display: none;
   }
 }
 
