@@ -1,7 +1,4 @@
 import { FunctionComponent, ReactNode } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faListUl, faPen } from "@fortawesome/free-solid-svg-icons";
-
 import { colorPalletGradient, cssColor, colorPallet } from "../../utils";
 
 import "./note-container.css";
@@ -10,6 +7,8 @@ type NoteContainerProps = {
   title: string;
   color_percent?: number;
   children?: ReactNode;
+  left_actions?: ReactNode;
+  right_actions?: ReactNode;
 };
 
 export const NoteContainer: FunctionComponent<NoteContainerProps> = function (
@@ -25,9 +24,9 @@ export const NoteContainer: FunctionComponent<NoteContainerProps> = function (
           ),
         }}
       >
-        <FontAwesomeIcon icon={faListUl} className="note__header__toc" />
+        <div className="note__header__left">{props.left_actions}</div>
         <h1 className="note__header__title">{props.title}</h1>
-        <FontAwesomeIcon icon={faPen} className="note__header__edit" />
+        <div className="note__header__right">{props.right_actions}</div>
       </div>
       <article className="note__body">{props.children}</article>
     </main>

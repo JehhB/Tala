@@ -1,6 +1,9 @@
 import { FunctionComponent, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faListUl, faPen } from "@fortawesome/free-solid-svg-icons";
+
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHightlight from "rehype-highlight";
@@ -16,6 +19,7 @@ import "highlight.js/styles/googlecode.css";
 
 export const ConstellationNote: FunctionComponent<{}> = function () {
   const { userName, constellationName, noteName } = useParams();
+
   const note = useFetch<Note>(
     `/api/v1/${userName}/${constellationName}/${noteName}`
   );
@@ -51,6 +55,8 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
         <NoteContainer
           title={note.data.title}
           color_percent={level / categories.length}
+          left_actions={<FontAwesomeIcon icon={faListUl} />}
+          right_actions={<FontAwesomeIcon icon={faPen} />}
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}

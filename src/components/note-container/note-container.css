@@ -49,13 +49,13 @@
   font-weight: 400;
 }
 
-.note__header__toc,
-.note__header__edit {
+.note__header__left,
+.note__header__right {
   height: 1rem;
   flex: 0 0 auto;
 }
 
-.note__header__edit {
+.note__header__right {
   margin-left: auto;
 }
 
