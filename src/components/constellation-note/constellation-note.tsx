@@ -4,18 +4,12 @@ import { Helmet } from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListUl, faPen } from "@fortawesome/free-solid-svg-icons";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHightlight from "rehype-highlight";
-import rehypeSanitize from "rehype-sanitize";
-import rehypeSlug from "rehype-slug";
 import useFetch from "react-fetch-hook";
 
 import { NoteContainer } from "../note-container";
 import { Note } from "../../utils";
 import { ConstellationContext } from "../../contexts";
-
-import "highlight.js/styles/googlecode.css";
+import { MarkdownViewer } from "../markdown-viewer";
 
 export const ConstellationNote: FunctionComponent<{}> = function () {
   const { userName, constellationName, noteName } = useParams();
@@ -33,41 +27,35 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
       (category) => note.data && category.id === note.data.category_id
     )?.index ?? -1) + 1;
 
-  if (note.error) {
+  if (note.error)
     return (
       <NoteContainer title="error">
         <h1 style={{ color: "red" }}>note.error.message</h1>
       </NoteContainer>
     );
-  } else if (!note.isLoading && note.data) {
-    return (
-      <>
-        <Helmet>
-          <title>{note.data.title}</title>
-          <meta
-            name="description"
-            content={
-              constellation.data.notes.find((n) => n.id === note.data!.id)
-                ?.description ?? ""
-            }
-          />
-        </Helmet>
-        <NoteContainer
-          title={note.data.title}
-          color_percent={level / categories.length}
-          left_actions={<FontAwesomeIcon icon={faListUl} />}
-          right_actions={<FontAwesomeIcon icon={faPen} />}
-        >
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeSlug, rehypeSanitize, rehypeHightlight]}
-          >
-            {note.data.content}
-          </ReactMarkdown>
-        </NoteContainer>
-      </>
-    );
-  } else {
-    return null;
-  }
+
+  if (note.isLoading || !note.data) return null;
+
+  return (
+    <>
+      <Helmet>
+        <title>{note.data.title}</title>
+        <meta
+          name="description"
+          content={
+            constellation.data.notes.find((n) => n.id === note.data!.id)
+              ?.description ?? ""
+          }
+        />
+      </Helmet>
+      <NoteContainer
+        title={note.data.title}
+        color_percent={level / categories.length}
+        left_actions={<FontAwesomeIcon icon={faListUl} />}
+        right_actions={<FontAwesomeIcon icon={faPen} />}
+      >
+        <MarkdownViewer markdown={note.data.content} />
+      </NoteContainer>
+    </>
+  );
 };
