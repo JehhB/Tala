@@ -1,0 +1,53 @@
+.editor-toolbar {
+  height: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.editor-toolbar__button {
+  height: 1.5rem;
+  width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border-radius: 4px;
+  border: none;
+}
+
+.editor-toolbar__button:hover {
+  background-color: var(--bg-color);
+}
+
+.editor-toolbar__button__icon {
+  width: 1rem;
+}
+
+.editor-toolbar__toggle {
+  height: 1.5rem;
+}
+
+.editor-toolbar__toggle__button {
+  height: 1.5rem;
+  padding: 0.25rem;
+  border: 1px solid var(--gray-1);
+  border-radius: 0px;
+  background-color: transparent;
+  font-size: 0.85rem;
+  line-height: 1em;
+}
+
+.editor-toolbar__toggle__button:disabled {
+  background-color: var(--bg-color);
+  color: var(--gray-1);
+}
+
+.editor-toolbar__toggle__button:first-child {
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+}
+
+.editor-toolbar__toggle__button:last-child {
+  border-radius: 0 4px 4px 0;
+}

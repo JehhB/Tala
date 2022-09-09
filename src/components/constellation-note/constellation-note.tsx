@@ -1,8 +1,8 @@
-import { FunctionComponent, useContext } from "react";
+import { FunctionComponent, useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faListUl, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faListUl } from "@fortawesome/free-solid-svg-icons";
 
 import useFetch from "react-fetch-hook";
 
@@ -10,9 +10,12 @@ import { NoteContainer } from "../note-container";
 import { Note } from "../../utils";
 import { ConstellationContext } from "../../contexts";
 import { MarkdownViewer } from "../markdown-viewer";
+import { EditorToolbar } from "../editor-toolbar";
 
 export const ConstellationNote: FunctionComponent<{}> = function () {
   const { userName, constellationName, noteName } = useParams();
+  const [isEditing, setEditing] = useState<boolean>(false);
+  const [isPreview, setPreview] = useState<boolean>(true);
 
   const note = useFetch<Note>(
     `/api/v1/${userName}/${constellationName}/${noteName}`
@@ -52,7 +55,11 @@ export const ConstellationNote: FunctionComponent<{}> = function () {
         title={note.data.title}
         color_percent={level / categories.length}
         left_actions={<FontAwesomeIcon icon={faListUl} />}
-        right_actions={<FontAwesomeIcon icon={faPen} />}
+        right_actions={
+          <EditorToolbar
+            {...{ isEditing, setEditing, isPreview, setPreview }}
+          />
+        }
       >
         <MarkdownViewer markdown={note.data.content} />
       </NoteContainer>
